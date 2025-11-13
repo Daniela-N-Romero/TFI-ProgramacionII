@@ -8,6 +8,6 @@ package main;
  *
  * @author Daniela Nahir Romero
  */
+
 public class Main {
-    
 }
