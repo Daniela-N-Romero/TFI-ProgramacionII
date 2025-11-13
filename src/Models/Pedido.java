@@ -9,5 +9,5 @@ package Models;
  * @author Daniela Nahir Romero
  */
 public class Pedido {
-    
+    private String numero;
 }
