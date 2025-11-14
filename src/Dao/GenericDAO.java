@@ -16,7 +16,7 @@ public interface GenericDAO<T> {
     
     void actualizar(T entidad) throws Exception;
     
-    void eliminar(int id_dom) throws Exception;
+    void eliminar(int id) throws Exception;
     
     T getById(int id) throws Exception;
     
