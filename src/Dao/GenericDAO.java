@@ -4,10 +4,23 @@
  */
 package Dao;
 
+import java.util.List;
+
 /**
  *
  * @author Daniela Nahir Romero
  */
-public interface GenericDAO {
+public interface GenericDAO<T> {
+    
+    void insertar(T entidad) throws Exception;
+    
+    void actualizar(T entidad) throws Exception;
+    
+    void eliminar(int id_dom) throws Exception;
+    
+    T getById(int id) throws Exception;
+    
+    List<T> getAll() throws Exception;
+    
     
 }

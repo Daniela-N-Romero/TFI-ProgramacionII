@@ -15,12 +15,12 @@ public class Pedido extends Base{
     private String numero;
     private java.time.LocalDate fecha;
     private String clienteNombre;
-    private String total;
+    private double total;
     private Estado estado;
 
     //Constructor completo:
     
-    public Pedido(String numero, LocalDate fecha, String clienteNombre, String total, Estado estado, int id) {
+    public Pedido(String numero, LocalDate fecha, String clienteNombre, double total, Estado estado, int id) {
         super(id, false);
         this.numero = numero;
         this.fecha = fecha;
@@ -61,11 +61,11 @@ public class Pedido extends Base{
         this.clienteNombre = clienteNombre;
     }
 
-    public String getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(String total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 
@@ -92,11 +92,5 @@ public class Pedido extends Base{
                 ", eliminado=" + isEliminado() + '}';
     }
    
-    
-    
-    
-    
-    
-    
     
 }
