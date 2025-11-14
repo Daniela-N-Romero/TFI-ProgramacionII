@@ -9,6 +9,7 @@ import Config.DatabaseConnection;
 import Models.Pedido;
 import java.util.List;
 import java.sql.Connection;
+import org.mariadb.jdbc.Statement;
 /**
  *
  * @author Daniela Nahir Romero
@@ -23,13 +24,11 @@ public class PedidoDAO implements GenericDAO<Pedido>{
     // Usamos 'try-with-resources' para asegurar que la conexión se cierre automáticamente
     try (Connection conn = DatabaseConnection.getConnection();
          // Creamos el PreparedStatement con la conexión y SQL
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        // Asignamos los valores del objeto 'pedido' a los parámetros (?) del SQL
+        // Asignamos los valores del objeto 'pedido' a los parámetros del SQL
         ps.setInt(1, pedido.getId()); 
         ps.setString(2, pedido.getNumero()); 
-        // Asumiendo que getFecha() devuelve un java.sql.Date o similar. 
-        // Si devuelve java.util.Date, necesitas convertirlo: new java.sql.Date(pedido.getFecha().getTime())
         ps.setDate(3, java.sql.Date.valueOf(pedido.getFecha())); 
         ps.setString(4, pedido.getClienteNombre()); 
         ps.setDouble(5, pedido.getTotal()); 

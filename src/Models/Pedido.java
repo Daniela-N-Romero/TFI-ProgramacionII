@@ -17,18 +17,21 @@ public class Pedido extends Base{
     private String clienteNombre;
     private double total;
     private Estado estado;
+    private Envio envio;
 
     //Constructor completo:
-    
-    public Pedido(String numero, LocalDate fecha, String clienteNombre, double total, Estado estado, int id) {
+
+    public Pedido(String numero, LocalDate fecha, String clienteNombre, double total, Estado estado, Envio envio, int id) {
         super(id, false);
         this.numero = numero;
         this.fecha = fecha;
         this.clienteNombre = clienteNombre;
         this.total = total;
         this.estado = estado;
+        this.envio = envio;
     }
 
+    
     //Constructor por defecto:
     
     public Pedido() {
@@ -76,6 +79,14 @@ public class Pedido extends Base{
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
+
+    public Envio getEnvio() {
+        return envio;
+    }
+
+    public void setEnvio(Envio envio) {
+        this.envio = envio;
+    }
     
     
 
@@ -89,7 +100,8 @@ public class Pedido extends Base{
                 ", clienteNombre=" + clienteNombre + 
                 ", total=" + total + 
                 ", estado=" + estado + 
-                ", eliminado=" + isEliminado() + '}';
+                ", eliminado=" + isEliminado() + 
+                ", envio=" + envio + '}';
     }
    
     
