@@ -11,6 +11,9 @@ import java.sql.SQLException;
  *
  * @author Daniela Nahir Romero
  */
+
+
+
 public class TransactionManager implements AutoCloseable {
     private Connection conn;
     private boolean transactionActive;

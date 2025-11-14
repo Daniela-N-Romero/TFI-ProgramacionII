@@ -37,7 +37,7 @@ public class DatabaseConnection {
      */
     public static Connection getConnection() throws SQLException {
         // Validación adicional para asegurarse de que las credenciales no estén vacías
-        if (URL == null || URL.isEmpty() || USER == null || USER.isEmpty() || PASSWORD == null) {
+        if (URL == null || URL.isEmpty() || USER == null || USER.isEmpty() || PASSWORD == null ) {
             throw new SQLException("Configuración de la base de datos incompleta o inválida.");
         }
         return DriverManager.getConnection(URL, USER, PASSWORD);
