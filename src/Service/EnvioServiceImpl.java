@@ -79,8 +79,10 @@ public class EnvioServiceImpl implements GenericService<Envio> {
             throw new IllegalArgumentException("El envio no puede ser null");
             
         }
-        if(envio.getTracking())
-        
+        if(envio.getTracking()== null || envio.getTracking().trim().isEmpty()){
+            throw new IllegalArgumentException("El número de tracking no puede estar vacío.");
+        }
+        if(envio.)
         
     }
     
