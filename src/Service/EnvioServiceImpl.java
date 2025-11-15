@@ -73,6 +73,10 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
     
     //Valida que un envio tenga datos correctos.
+    //validar campo tracking
+    //validar empresa
+    //campo costo
+    //validar estado inicial
     
     private void validateEnvio(Envio envio) {
         if(envio == null) {
@@ -82,21 +86,16 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if(envio.getTracking()== null || envio.getTracking().trim().isEmpty()){
             throw new IllegalArgumentException("El número de tracking no puede estar vacío.");
         }
-        if(envio.)
-        
-    }
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        if(envio.getEmpresa() == null) {
+            throw new IllegalArgumentException("Debe especificarse la empresa de envío (ej: ANDREANI, OCA).");   
+        }
+        if(envio.getCosto() <= 0){
+            throw new IllegalArgumentException("El costo de envío debe ser un valor positivo.");
+        }
+        if(envio.getEstado() == null){
+            throw new IllegalArgumentException("El estado del Envío es obligatorio.");
+        }
+           
+    }   
     
 }
