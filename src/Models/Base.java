@@ -10,12 +10,12 @@ package Models;
  */
 public abstract class Base {
     //Definimos atributos que serán comunes a todas las clases:
-    private int id;
+    private Long id;
     private boolean eliminado;
 
     
     //Constructor completo con todos los campos:
-    protected Base(int id, boolean eliminado) {
+    protected Base(Long id, boolean eliminado) {
         this.id = id;
         this.eliminado = eliminado; 
     }
@@ -27,11 +27,11 @@ public abstract class Base {
     
     
 //Getter y Setter
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
     

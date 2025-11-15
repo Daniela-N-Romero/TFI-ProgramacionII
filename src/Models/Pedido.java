@@ -21,7 +21,7 @@ public class Pedido extends Base{
 
     //Constructor completo:
 
-    public Pedido(String numero, LocalDate fecha, String clienteNombre, double total, Estado estado, Envio envio, int id) {
+    public Pedido(String numero, LocalDate fecha, String clienteNombre, double total, Estado estado, Envio envio, Long id) {
         super(id, false);
         this.numero = numero;
         this.fecha = fecha;
