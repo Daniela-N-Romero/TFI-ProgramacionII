@@ -22,7 +22,7 @@ public class Envio extends Base{
     
     //Constructor completo:
 
-    public Envio(String tracking, double costo, LocalDate fechaDespacho, LocalDate fechaEstimada, Empresa empresa, EstadoEnvio estado, TipoEnvio tipo, int id) {
+    public Envio(String tracking, double costo, LocalDate fechaDespacho, LocalDate fechaEstimada, Empresa empresa, EstadoEnvio estado, TipoEnvio tipo, Long id) {
         super(id, false);
         this.tracking = tracking;
         this.costo = costo;
@@ -71,6 +71,31 @@ public class Envio extends Base{
     public void setFechaEstimada(LocalDate fechaEstimada) {
         this.fechaEstimada = fechaEstimada;
     }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+
+    public EstadoEnvio getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoEnvio estado) {
+        this.estado = estado;
+    }
+
+    public TipoEnvio getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoEnvio tipo) {
+        this.tipo = tipo;
+    }
+    
 
     @Override
     public String toString() {
