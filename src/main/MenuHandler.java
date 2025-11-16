@@ -15,6 +15,7 @@ import java.time.LocalDate; // << NECESITAS IMPORTAR LocalDate
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import Service.PedidoServiceImpl; // Asumo que esta es tu implementación
+import java.util.List;
 
 /**
  *
@@ -67,6 +68,102 @@ public class MenuHandler {
             System.err.println("Error al crear el pedido " + e.getMessage());
         }
     }
+    
+    public void listarPedidos() {
+        try {
+            List<Pedido> pedidos;
+            pedidos = pedidoService.getAll();
+            if(pedidos.isEmpty()) {
+                System.out.println("No se encontraron pedidos");
+            }
+            for (Pedido p : pedidos) {
+                System.out.println("ID: " + p.getId() + 
+                        ", Numero de pedido: " + p.getNumero() + 
+                        ", Fecha: " + p.getFecha() + 
+                        ", Nombre de cliente: " + p.getClienteNombre() + 
+                        ", Total: " + p.getTotal() + 
+                        ", Estado del pedido: " + p.getEstado());
+                if(p.getEnvio() != null) {
+                    System.out.println(" Envio: " + p.getEnvio().toString());
+                }
+            }
+            
+        } catch(Exception e) {
+            System.err.println("Error al listar pedidos: " + e.getMessage());
+        }
+    }
+    
+    public void actualizarPedidos() {
+        try {
+            System.out.print("ID del pedido a actualizar: ");
+            long id = Long.parseLong(scanner.nextLine().trim());
+            Pedido p = pedidoService.getByID((long)id);
+            
+            if(p == null) {
+                System.out.println("Pedido no encontrado.");
+                return;
+            }
+            // Actualizar Número de Pedido y Cliente 
+            System.out.println("Numero de pedido (actual: " + p.getNumero() + ", Enter para mantener): ");
+            String numero = scanner.nextLine().trim();
+            if(!numero.isEmpty()) {
+                p.setNumero(numero);
+            }
+            System.out.println("Nombre de cliente (actual: " + p.getClienteNombre()+ ", Enter para mantener): ");
+            String nombre = scanner.nextLine().trim();
+            if(!nombre.isEmpty()) {
+                p.setClienteNombre(nombre);
+            }
+            //Para actualizar el Total, debemos convertir el double en String para poder ser deferenciado, 
+            // de lo contrario no nos deja llamar al método isEmpty()
+            System.out.println("Total del pedido (actual: $" + String.format("%.2f", p.getTotal()) + ", Enter para mantener): ");
+            String totalString = scanner.nextLine().trim();
+            if(!totalString.isEmpty()) {
+                try {
+                    double nuevoTotal = Double.parseDouble(totalString);
+                    p.setTotal(nuevoTotal);
+                } catch(NumberFormatException e) {
+                    System.err.println("Error: El valor ingresado no es un número válido. Se mantendrá el total anterior.");
+                }
+            }
+             //Actualizar Estado 
+            System.out.println("Estado del pedido (actual: " + p.getEstado().name() + ", Enter para mantener. Opciones: NUEVO, FACTURADO, ENVIADO): ");
+            String estadoString = scanner.nextLine().trim();
+            if (!estadoString.isEmpty()) {
+                try {
+                    // Convertir la entrada del usuario (String) a Enum
+                    p.setEstado(Estado.valueOf(estadoString.toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Error: El estado ingresado no es válido. Se mantendrá el estado anterior.");
+                }
+            }
+            //Manejo de errores
+        } catch (NumberFormatException e) {
+        System.err.println("Error: El ID ingresado debe ser un número entero válido.");
+        } catch (Exception e) {
+        System.err.println("Error al actualizar el pedido: " + e.getMessage());
+        }
+    }
+        /* Flujo:
+        1. Solicita el ID del pedido.
+        2. Invoca pedidoService.eliminar() que:
+            - Marca pedido.eliminado = TRUE
+        */
+        public void eliminarPedido() {
+            try {
+                System.out.print("ID del pedido a eliminar: ");
+                long id = Long.parseLong(scanner.nextLine());
+                pedidoService.eliminar(id);
+                System.out.println("Pedido eliminado exitosamente.");
+            } catch(NumberFormatException e) {
+                System.err.println("Error al eliminar Pedido" + e.getMessage());
+            }
+        }
+        
+        
+    
+    
+    
     
     public Envio crearEnvio() {
         try {
