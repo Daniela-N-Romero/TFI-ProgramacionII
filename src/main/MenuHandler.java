@@ -4,17 +4,18 @@
  */
 package main;
 
+//Importamos todas las bibliotecas
 import Models.Pedido;
 import Models.Estado;
-import Service.PedidoServiceImpl;
-import Models.Envio;
 import Models.TipoEnvio;
 import Models.Empresa;
 import Models.EstadoEnvio;
-import java.time.LocalDate; // << NECESITAS IMPORTAR LocalDate
+import Models.Envio;
+import Service.EnvioServiceImpl;
+import java.time.LocalDate; 
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import Service.PedidoServiceImpl; // Asumo que esta es tu implementación
+import Service.PedidoServiceImpl; 
 import java.util.List;
 
 /**
@@ -25,17 +26,22 @@ public class MenuHandler {
     
     private final Scanner scanner;
     private final PedidoServiceImpl pedidoService;
+    private final EnvioServiceImpl envioService;
     
     //Constructor con inyección de dependencias, valida que las dependencias no sean null.
-    public MenuHandler(Scanner scanner, PedidoServiceImpl pedidoService) {
+    public MenuHandler(Scanner scanner, PedidoServiceImpl pedidoService, EnvioServiceImpl envioService) {
         if(scanner == null) {
             throw new IllegalArgumentException("Scanner no puede ser null");
         }
         if(pedidoService == null) {
             throw new IllegalArgumentException("PedidoService no puede ser null");
         }
+        if(envioService == null) {
+            throw new IllegalArgumentException("EnvioService no puede ser null");
+        }   
         this.scanner = scanner;
         this.pedidoService = pedidoService;
+        this.envioService = envioService;
     }
     
     
@@ -48,7 +54,7 @@ public class MenuHandler {
             System.out.print("Total: ");
             double total = Double.parseDouble(scanner.nextLine().trim());
             Estado estado = Estado.NUEVO;
-            
+            //Implementamos el método para crear un Envío
             Envio envio = null;
             System.out.print("¿Desea agregar un nuevo envio? (s/n): ");
             if(scanner.nextLine().trim().equalsIgnoreCase("s")) {
@@ -87,12 +93,12 @@ public class MenuHandler {
                     System.out.println(" Envio: " + p.getEnvio().toString());
                 }
             }
-            
-        } catch(Exception e) {
-            System.err.println("Error al listar pedidos: " + e.getMessage());
+            } catch(Exception e) {
+                System.err.println("Error al listar pedidos: " + e.getMessage());
         }
     }
     
+    //Método para actualizar pedidos:
     public void actualizarPedidos() {
         try {
             System.out.print("ID del pedido a actualizar: ");
@@ -160,47 +166,198 @@ public class MenuHandler {
             }
         }
         
-        
-    
-    
-    
-    
-    public Envio crearEnvio() {
-        try {
-            System.out.println("Codigo alfanumerico de tracking: ");
-            String tracking = scanner.nextLine().trim();
-            System.out.println("Costo del envio: ");
-            double costo = Double.parseDouble(scanner.nextLine().trim());
-            System.out.println("Empresa de envio (ANDREANI, OCA, CORREO_ARG)");
-            Empresa empresa = Empresa.valueOf(scanner.nextLine().trim().toUpperCase());
-            System.out.println("Tipo de envio (ESTANDAR, EXPRESS)");
-            TipoEnvio tipo = TipoEnvio.valueOf(scanner.nextLine().trim().toUpperCase());
-            //Para el estado del envio, siempre comenzará por EN_PREPARACION
-            EstadoEnvio estado = EstadoEnvio.EN_PREPARACION;
-            System.out.println("Estado inicial del envio: " + estado.name());
-            //Para la fechaDespacho le ponemos por defecto 1 día despues de "hoy"
-            LocalDate fechaDespacho = LocalDate.now().plusDays(1);
-            System.out.println("Fecha del despacho (mañana): " + fechaDespacho);
-            //Para la fecha estimada le ponemos por defecto 5 días despues de "hoy"
-            LocalDate fechaEstimada = LocalDate.now().plusDays(5);
-            System.out.println("\"Fecha del despacho (mañana): " + fechaEstimada);
-            
-            //Creamos el objeto Envio con su Constructor completo.
-            Envio envio = new Envio(tracking, costo, fechaDespacho, fechaEstimada, empresa, estado, tipo, 0L);
-            System.out.println("Datos de Envío recopilados correctamente.");
-            return envio;
-            
-        } catch (NumberFormatException e) {
-            System.err.println("Error: El campo 'total' debe ser un número válido");
-            return null;
-        } catch(IllegalArgumentException e) {
-            System.err.println("Error de Enum: La empresa o el tipo de envío ingresado no es válido.");
-            return null;
-        } catch (Exception e) {
-            System.err.println("Error al crear el Envio " + e.getMessage());
-            return null;
+        public void buscarPedidoPorId () {
+            try {
+                System.out.print("Ingrese el ID del pedido a buscar: ");
+                long id = Long.parseLong(scanner.nextLine().trim());
+                Pedido pedido = pedidoService.getByID(id);
+                if(pedido == null) {
+                    System.out.println("Pedido con id " + id + " no encontrado.");  
+                    return;
+                }
+                //Mostramos la información del pedido encontrado:
+                System.out.println("PEDIDO ENCONTRADO: ");
+                System.out.println("---------------------------------");
+                System.out.println("ID: " + pedido.getId());
+                System.out.println("Nro: " + pedido.getNumero());
+                System.out.println("Cliente: " + pedido.getClienteNombre());
+                System.out.println("Total: $ " + pedido.getTotal());
+                System.out.println("Estado: " + pedido.getEstado().name());
+                
+                //Mostramos la información del Envío asociado (si es que tiene) al pedido.
+                if(pedido.getEnvio() != null) {
+                    System.out.println("Envio asociado: " + pedido.getEnvio().toString());
+                    //En caso que no tenga envío asociado:
+                } else {
+                    System.out.println("Sin Envio asociado.");
+                }
+                System.out.println("---------------------------------");
+            } catch(NumberFormatException e) {
+                System.err.println("❌ Error: El ID ingresado debe ser un número entero válido.");
+            } catch (Exception e) {
+                System.err.println("❌ Error al buscar pedido: " + e.getMessage());
+            }
         }
-    }
-}
+    
+    
+    
+        //Método para crear Envío
+        public Envio crearEnvio() {
+            try {
+                System.out.println("Codigo alfanumerico de tracking: ");
+                String tracking = scanner.nextLine().trim();
+                System.out.println("Costo del envio: ");
+                double costo = Double.parseDouble(scanner.nextLine().trim());
+                System.out.println("Empresa de envio (ANDREANI, OCA, CORREO_ARG)");
+                Empresa empresa = Empresa.valueOf(scanner.nextLine().trim().toUpperCase());
+                System.out.println("Tipo de envio (ESTANDAR, EXPRESS)");
+                TipoEnvio tipo = TipoEnvio.valueOf(scanner.nextLine().trim().toUpperCase());
+                //Para el estado del envio, siempre comenzará por EN_PREPARACION
+                EstadoEnvio estado = EstadoEnvio.EN_PREPARACION;
+                System.out.println("Estado inicial del envio: " + estado.name());
+                //Para la fechaDespacho le ponemos por defecto 1 día despues de "hoy"
+                LocalDate fechaDespacho = LocalDate.now().plusDays(1);
+                System.out.println("Fecha del despacho (mañana): " + fechaDespacho);
+                //Para la fecha estimada le ponemos por defecto 5 días despues de "hoy"
+                LocalDate fechaEstimada = LocalDate.now().plusDays(5);
+                System.out.println("\"Fecha del despacho (mañana): " + fechaEstimada);
+            
+                //Creamos el objeto Envio con su Constructor completo.
+                Envio envio = new Envio(tracking, costo, fechaDespacho, fechaEstimada, empresa, estado, tipo, 0L);
+                System.out.println("Datos de Envío recopilados correctamente.");
+                return envio;
+            
+            } catch (NumberFormatException e) {
+                System.err.println("Error: El campo 'total' debe ser un número válido");
+                return null;
+            } catch(IllegalArgumentException e) {
+                System.err.println("Error de Enum: La empresa o el tipo de envío ingresado no es válido.");
+                return null;
+            } catch (Exception e) {
+                System.err.println("Error al crear el Envio " + e.getMessage());
+                return null;
+            }
+        }
+        
+        // CRUD para la clase Envio
+        
+        public void listarEnvios() {
+            try {
+                List<Envio> envios = envioService.getAll();
+                if(envios.isEmpty()) {
+                    System.out.println("No se encontraron Envios.");
+                    return;
+                }
+                System.out.println("Envios registrados: ");
+                for (Envio e : envios) {
+                    System.out.println("----------------------------");
+                    System.out.println(e.toString());
+                }
+                System.out.println("=================");
+            } catch(Exception e) {
+                System.out.println("Error al listar Envios " + e.getMessage());
+            }
+        }
+        //Método para buscar Envios por ID
+        public void buscarEnvioPorId() {
+            try {
+                System.out.print("Ingrese el ID del Envio a buscar: ");
+                long id = Long.parseLong(scanner.nextLine().trim());
+                Envio envio = envioService.getById(id);
+                
+                if(envio == null) {
+                    System.out.println("Envio con id " + id + " no encontrado.");
+                    return;
+                }
+                System.out.println("ENVIO ENCONTRADO: ");
+                System.out.println("----------------------------");
+                System.out.println(envio.toString()); //Utilizamos el toString para mostrar la informacion.
+                System.out.println("----------------------------");
+                
+            } catch(NumberFormatException e) {
+                System.err.println("Error: El ID ingresado debe ser un número válido.");
+            } catch (Exception e) {
+                System.err.println("Error al buscar envío: " + e.getMessage());
+            }
+        }
+        
+        public void actualizarEnvio() {
+            try {
+                System.out.print("ID del Envio a actualizar: ");
+                long id = Long.parseLong(scanner.nextLine().trim());
+                Envio envio = envioService.getById(id);
+                
+                if(envio == null) {
+                    System.out.println("Envio con id " + id + " no encontrado.");
+                    return;
+                }
+                //TRACKING.
+                System.out.println("Tracking (actual: " + envio.getTracking() + " Enter para mantener): ");
+                String tracking = scanner.nextLine().trim();
+                if(!tracking.isEmpty()) {
+                    envio.setTracking(tracking);
+                }
+                //COSTO.
+                System.out.println("Costo (actual: $" + String.format("%.2f", envio.getCosto()) + ", Enter para mantener): ");
+                String costoString = scanner.nextLine().trim();
+                if (!costoString.isEmpty()) {
+                    try {
+                        envio.setCosto(Double.parseDouble(costoString));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error: Costo inválido. Se mantiene el anterior.");
+                    }
+                }
+                //EMPRESA
+                System.out.println("Empresa (actual: " + envio.getEmpresa().name() + ", Enter para mantener. Opciones: ANDREANI, OCA, CORREO_ARG): ");
+                String empresaString = scanner.nextLine().trim();
+                if (!empresaString.isEmpty()) {
+                    try {
+                        envio.setEmpresa(Empresa.valueOf(empresaString.toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error: Empresa inválida. Se mantiene la anterior.");
+                    }
+                }
+                //ESTADO DEL ENVIO
+                System.out.println("Estado (actual: " + envio.getEstado().name() + ", Enter para mantener. Opciones: EN_PREPARACION, DESPACHADO, EN_REPARTO, ENTREGADO): ");
+                String estadoString = scanner.nextLine().trim();
+                if (!estadoString.isEmpty()) {
+                    try {
+                        envio.setEstado(EstadoEnvio.valueOf(estadoString.toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error: Estado de envío inválido. Se mantiene el anterior.");
+                    }
+                }
+                envioService.actualizar(envio);
+                System.out.println("Envío ID " + envio.getId() + " actualizado exitosamente.");
+            } catch (NumberFormatException e) {
+                System.err.println("Error: El ID debe ser un número entero válido.");
+            } catch (Exception e) {
+                System.err.println("Error al actualizar el envío: " + e.getMessage());
+            }
+        }
+        
+        //Método para eliminar Envios.
+        public void eliminarEnvio() {
+            try {
+                System.out.print("ID del Envio a eliminar: ");
+                long id = Long.parseLong(scanner.nextLine());
+                // Confirmación de seguridad
+                System.out.print("¿Confirma la eliminación del Envío ID " + id + "? (s/n): ");
+                String confirmacion = scanner.nextLine().trim();
 
+                if (!confirmacion.equalsIgnoreCase("s")) {
+                    System.out.println("Eliminación cancelada.");
+                    return;
+                }
+                //De confirmarlo, se procede al Soft Delete.
+                envioService.eliminar(id);
+                System.out.println("Envio ID " + id + " eliminado exitosamente.");
+            }catch (NumberFormatException e) {
+                System.err.println("Error: El ID ingresado debe ser un número entero válido.");
+            } catch(Exception e) {
+                System.err.println("Error al eliminar el Envio" + e.getMessage());
+            }
+        }
+             
+}
     

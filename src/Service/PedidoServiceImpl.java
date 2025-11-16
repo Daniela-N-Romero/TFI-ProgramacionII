@@ -17,8 +17,6 @@ import java.util.List;
 //Capa intermedia entre la UI y el DAO que aplica validaciones de negocio complejas.
 public class PedidoServiceImpl implements GenericService<Pedido> {
     private final PedidoDAO pedidoDAO;
-    
-    
     private final EnvioServiceImpl envioServiceImpl;
     
     //contructor
@@ -35,13 +33,14 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
     }
     
     
-    //Inserta una nuevo pedido en la base de datos.
+    //Inserta un nuevo pedido en la base de datos.
     //public void insertar(Pedido pedido) throws Exception {
         //validatePedido(pedido);
         //validateEnvio(pedido.getEnvio(), null);
     
     //Actualiza una pedido existente en la base de datos
     //Validaciones:
+    @Override
     public void actualizar(Pedido pedido) throws Exception {
         validatePedido(pedido);
         if(pedido.getId() <= 0){
@@ -83,11 +82,11 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
         return pedidoDAO.buscarPorNumeroPedido(filtro);        
     }
     //buscar pedido por Id
-    public Pedido buscarPorId(String id) throws Exception {
+    public Pedido buscarPorId(long id) throws Exception {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID no puede estar vacío");    
         }
-         return pedidoDAO.buscarPorId(id);
+         return pedidoDAO.getById(id);
     }
     // Elimina un pedido de forma SEGURA actualizando primero la FK del pedido.
     public void eliminarEnvioDePedido(int envioId, int pedidoId) throws Exception {

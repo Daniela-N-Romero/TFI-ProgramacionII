@@ -6,7 +6,6 @@ package Service;
 import Dao.EnvioDAO;
 import Dao.GenericDAO;
 import Models.Envio;
-
 import java.util.List;
 
 
@@ -31,6 +30,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     
     //Inserta un nuevo envio en la base de datos.
     
+    @Override
     public void insertar (Envio envio) throws Exception{
         validateEnvio(envio);
         envioDAO.insertar(envio);
@@ -38,6 +38,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
     //Actualiza un envio existente en la base de datos.
     
+    @Override
     public void actualizar(Envio envio) throws Exception {
         validateEnvio(envio);
         if(envio.getId()<= 0){
@@ -50,7 +51,8 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     
     //Elimina lógicamente un envio
     
-    public void eliminar(int id) throws Exception {
+    @Override
+    public void eliminar(long id) throws Exception {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID debe ser mayor a 0");
         }
@@ -59,15 +61,17 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     
     // Obtiene un envio por su ID.
     
-    public Envio getById(int id) throws Exception {
+    
+    public Envio getById(long id) throws Exception {
         if(id <= 0) {
             throw new IllegalArgumentException("El ID debe ser mayor a 0");
-            
+             
         }
         return envioDAO.getById(id);
     }
     //Obtiene todos los envios activos (eliminado=FALSE).
     
+    @Override
     public List<Envio> getAll() throws Exception {
         return envioDAO.getAll();
     }

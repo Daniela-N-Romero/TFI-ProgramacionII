@@ -24,12 +24,12 @@ public class EnvioDAO implements GenericDAO<Envio> {
     }
 
     @Override
-    public void eliminar(int id_dom) throws Exception {
+    public void eliminar(long id_dom) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public Envio getById(int id) throws Exception {
+    public Envio getById(long id) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

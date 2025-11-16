@@ -26,7 +26,7 @@ public class MenuDisplay {
     System.out.println("\n===== GESTIÓN DE PEDIDOS =====");
     System.out.println("1. Insertar nuevo Pedido (y Envío opcional)"); //Listo
     System.out.println("2. Listar todos los Pedidos"); //Listo
-    System.out.println("3. Buscar Pedido por ID");
+    System.out.println("3. Buscar Pedido por ID"); //Listo
     System.out.println("4. Actualizar datos del Pedido"); //Listo
     System.out.println("5. Eliminar Pedido (Soft Delete)"); //Listo
     System.out.println("9. Volver al Menu Principal");

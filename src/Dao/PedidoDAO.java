@@ -72,12 +72,12 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     
 
     @Override
-    public void eliminar(int id) throws Exception {
+    public void eliminar(long id) throws Exception {
         // Implementación de Soft Delete
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
 
-            stmt.setInt(1, id);
+            stmt.setLong(1, id);
             int rowsAffected = stmt.executeUpdate();
 
             if (rowsAffected == 0) {
@@ -87,11 +87,11 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     @Override
-    public Pedido getById(int id) throws Exception {
+    public Pedido getById(long id) throws Exception {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
 
-            stmt.setInt(1, id);
+            stmt.setLong(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -152,26 +152,26 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         }
     }
     
-    private Pedido mapResultSetToPedido(ResultSet rs) throws SQLException {
-    Pedido pedido = new Pedido();
-    // Mapeo de atributos de Base (asumo que Base tiene setId y isEliminado)
-    pedido.setId(rs.getLong("id"));
-    //  Mapeo de atributos de Pedido
-    pedido.setNumero(rs.getString("numero_pedido"));
-    // Conversión de java.sql.Date a java.time.LocalDate
-    java.sql.Date sqlDate = rs.getDate("fecha");
-    if (sqlDate != null) {
-        pedido.setFecha(sqlDate.toLocalDate());
-    }
-    pedido.setClienteNombre(rs.getString("cliente_nombre"));
-    // Se lee como double y se convierte a String.
-    pedido.setTotal(rs.getDouble("total"));
-    // Conversión de String (de la DB) a Enum (Models.Estado)
-    String estadoString = rs.getString("estado");
-    if (estadoString != null) {
-        pedido.setEstado(Estado.valueOf(estadoString));
-    }
-    // 2. Mapeo de Envío (Eager Loading)
+        private Pedido mapResultSetToPedido(ResultSet rs) throws SQLException {
+        Pedido pedido = new Pedido();
+        // Mapeo de atributos de Base (asumo que Base tiene setId y isEliminado)
+        pedido.setId(rs.getLong("id"));
+        //  Mapeo de atributos de Pedido
+        pedido.setNumero(rs.getString("numero_pedido"));
+        // Conversión de java.sql.Date a java.time.LocalDate
+        java.sql.Date sqlDate = rs.getDate("fecha");
+        if (sqlDate != null) {
+            pedido.setFecha(sqlDate.toLocalDate());
+        }
+        pedido.setClienteNombre(rs.getString("cliente_nombre"));
+        // Se lee como double y se convierte a String.
+        pedido.setTotal(rs.getDouble("total"));
+        // Conversión de String (de la DB) a Enum (Models.Estado)
+        String estadoString = rs.getString("estado");
+        if (estadoString != null) {
+            pedido.setEstado(Estado.valueOf(estadoString));
+        }
+        // 2. Mapeo de Envío (Eager Loading)
         long envioId = rs.getLong("e_id"); // e_id viene del SELECT_BASE
         // rs.wasNull() comprueba si el valor leído (e_id) era NULL en la BD
         if (!rs.wasNull()) { 
