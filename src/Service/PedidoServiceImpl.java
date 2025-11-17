@@ -80,8 +80,24 @@ public void insertar(Pedido pedido) throws Exception {
 }
 
      @Override
-    public void actualizar(Pedido entidades) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void actualizar(Pedido pedido) throws Exception {
+        // validatePedido(pedido); // Asumiendo que tienes un método de validación
+    
+        // Usamos el TransactionManager para garantizar la gestión correcta de la conexión.
+        try (txManager) { 
+            Connection conn = txManager.getConnection();
+            txManager.startTransaction(); // Opcional, si el DAO lo requiere para setear auto-commit=false
+        
+            // 1. Llama al DAO para ejecutar el UPDATE
+            pedidoDAO.actualizarTx(pedido, conn); 
+
+            txManager.commit(); // 2. Confirma los cambios en la base de datos
+            System.out.println("Pedido con ID " + pedido.getId() + " actualizado correctamente.");
+        
+        } catch (Exception e) {
+            txManager.rollback(); // 3. Deshace si algo falla
+            throw new Exception("Error transaccional al actualizar el pedido: " + e.getMessage(), e);
+        }
     }
         
     

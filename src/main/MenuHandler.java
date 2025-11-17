@@ -166,6 +166,8 @@ public class MenuHandler {
                     System.err.println("Error: El estado ingresado no es válido. Se mantendrá el estado anterior.");
                 }
             }
+            pedidoService.actualizar(p); 
+            System.out.println("Pedido actualizado exitosamente.");
             //Manejo de errores
         } catch (NumberFormatException e) {
         System.err.println("Error: El ID ingresado debe ser un número entero válido.");

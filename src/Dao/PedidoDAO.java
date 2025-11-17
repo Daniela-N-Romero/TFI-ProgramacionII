@@ -233,9 +233,35 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     @Override
-    public void actualizarTx(Pedido entidad, Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    public void actualizarTx(Pedido pedido, Connection conn) throws Exception {
+            if (conn == null) {
+            throw new IllegalArgumentException("La conexión para la transacción no puede ser nula.");
+        }
+    
+        try (PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
+        
+            // 1. Setear campos SET (Parámetros 1 a 5)
+            stmt.setString(1, pedido.getNumero());
+            stmt.setDate(2, java.sql.Date.valueOf(pedido.getFecha())); 
+            stmt.setString(3, pedido.getClienteNombre());
+            stmt.setBigDecimal(4, pedido.getTotal());
+            stmt.setString(5, pedido.getEstado().name());
+        
+            // 2. Setear la Cláusula WHERE (Parámetro 6)
+            stmt.setLong(6, pedido.getId()); 
+
+            int rowsAffected = stmt.executeUpdate();
+        
+            if (rowsAffected == 0) {
+                // Si rowsAffected es 0, el ID no se encontró o no se actualizó.
+                throw new SQLException("No se encontró el Pedido con ID: " + pedido.getId() + " para actualizar.");
+            }
+        
+        } catch (SQLException e) {
+            // Relanzar la excepción para que el Service pueda hacer el rollback
+            throw new Exception("Error al ejecutar UPDATE en PedidoDAO: " + e.getMessage(), e);
+        }
+}
 
     @Override
     public void eliminarTx(long id, Connection conn) throws Exception {
