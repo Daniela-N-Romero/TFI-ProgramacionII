@@ -6,6 +6,7 @@ package Service;
 import Config.TransactionManager;
 import Dao.EnvioDAO;
 import Models.Envio;
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -99,7 +100,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if(envio.getEmpresa() == null) {
             throw new IllegalArgumentException("Debe especificarse la empresa de envío (ej: ANDREANI, OCA).");   
         }
-        if(envio.getCosto() <= 0){
+        if(envio.getCosto() == null || envio.getCosto().compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("El costo de envío debe ser un valor positivo.");
         }
         if(envio.getEstado() == null){

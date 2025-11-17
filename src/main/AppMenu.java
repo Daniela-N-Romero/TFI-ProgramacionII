@@ -13,6 +13,7 @@ import Service.PedidoServiceImpl;
 import java.sql.Connection;
 import java.util.Scanner;
 import java.sql.SQLException;
+import utils.uniquesGenerator;
 
 /**
  *
@@ -25,6 +26,7 @@ public class AppMenu {
     private final Scanner scanner;
     private PedidoServiceImpl pedidoService;
     private EnvioServiceImpl envioService;
+    private uniquesGenerator uniquesGenerator;
 
     public AppMenu(){
         try {
@@ -33,8 +35,9 @@ public class AppMenu {
             System.out.println("Error al iniciar los servicios"+ ex.getMessage());;
         }
         this.scanner = new Scanner(System.in);
-        this.menuHandler = new MenuHandler(this.scanner, this.pedidoService, this.envioService);
+        this.menuHandler = new MenuHandler(this.scanner, this.pedidoService, this.envioService, this.uniquesGenerator);
         this.running = true;
+                
     }
 
  
@@ -103,6 +106,7 @@ public class AppMenu {
         // 3. Capa Service y asignación a campos 
         this.envioService = new EnvioServiceImpl(envioDAO, txManager); 
         this.pedidoService = new PedidoServiceImpl(pedidoDAO, envioDAO, txManager); 
+        this.uniquesGenerator = new uniquesGenerator(pedidoDAO,envioDAO);
     }
     
     

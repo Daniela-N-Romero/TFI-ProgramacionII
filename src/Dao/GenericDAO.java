@@ -24,14 +24,12 @@ public interface GenericDAO<T> {
     
     List<T> getAll() throws Exception;
     
-        // --- MÉTODOS CRUD TRANSACCIONALES (Requieren Connection externa) ---
+    // --- MÉTODOS CRUD TRANSACCIONALES (Requieren Connection externa) ---
     // Usados por la capa Service para agrupar múltiples operaciones
     void insertarTx(T entidad, Connection conn) throws Exception;
 
     void actualizarTx(T entidad, Connection conn) throws Exception;
 
     void eliminarTx(long id, Connection conn) throws Exception;
-
-    T getByIdTx(long id, Connection conn) throws Exception;
     
 }

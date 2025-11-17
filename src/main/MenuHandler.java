@@ -15,7 +15,9 @@ import Service.EnvioServiceImpl;
 import java.time.LocalDate; 
 import java.util.Scanner;
 import Service.PedidoServiceImpl; 
+import java.math.BigDecimal;
 import java.util.List;
+import utils.uniquesGenerator;
 
 /**
  *
@@ -26,9 +28,9 @@ public class MenuHandler {
     private final Scanner scanner;
     private final PedidoServiceImpl pedidoService;
     private final EnvioServiceImpl envioService;
-    
+    private final uniquesGenerator uniquesGenerator;
     //Constructor con inyección de dependencias, valida que las dependencias no sean null.
-    public MenuHandler(Scanner scanner, PedidoServiceImpl pedidoService, EnvioServiceImpl envioService) {
+    public MenuHandler(Scanner scanner, PedidoServiceImpl pedidoService, EnvioServiceImpl envioService,uniquesGenerator uniquesGenerator) {
         if(scanner == null) {
             throw new IllegalArgumentException("Scanner no puede ser null");
         }
@@ -41,28 +43,47 @@ public class MenuHandler {
         this.scanner = scanner;
         this.pedidoService = pedidoService;
         this.envioService = envioService;
+        this.uniquesGenerator = uniquesGenerator;
     }
     
     
     public void crearPedido() {
+        boolean envioSolicitado = false;
+        
         try { 
-            System.out.print("Numero de pedido: ");
-            String numero = scanner.nextLine().trim();
+            String numeroPedido = uniquesGenerator.generarNumeroPedido();
             System.out.print("Nombre del cliente: ");
             String nombreCliente = scanner.nextLine().trim();
             System.out.print("Total: ");
             double total = Double.parseDouble(scanner.nextLine().trim());
+            BigDecimal totalDecimal = BigDecimal.valueOf(total);
             Estado estado = Estado.NUEVO;
             //Implementamos el método para crear un Envío
             Envio envio = null;
             System.out.print("¿Desea agregar un nuevo envio? (s/n): ");
-            if(scanner.nextLine().trim().equalsIgnoreCase("s")) {
+            String opcionEnvio = scanner.nextLine().trim();
+            
+            envioSolicitado = opcionEnvio.equalsIgnoreCase("s");
+
+            if (envioSolicitado) {
+                // Si el usuario dijo 's', intentar crear el Envío.
                 envio = crearEnvio();
+                
+                // VALIDACIÓN: Si el usuario pidió Envío y falló la captura, ABORTAR.
+                if (envio == null) { 
+                    System.out.println("\n-------------------------------------------------------------");
+                    System.out.println("Creación de Pedido CANCELADA. El envío es obligatorio y falló la captura de datos.");
+                    System.out.println("-------------------------------------------------------------");
+                    return; // Aborta el método sin llamar al servicio
+                }
+            } else {
+                // Si dijo 'n', el envío se mantiene como null (retiro en local).
+                System.out.println("El pedido se generará para retiro en local (sin Envío).");
             }
             LocalDate fechaPedido = LocalDate.now(); //Generamos la fecha como "hoy"
             
             //Llamamos al constructor de Pedido
-            Pedido pedido = new Pedido(numero, fechaPedido, nombreCliente, total, estado, envio, 0L);
+            Pedido pedido = new Pedido(numeroPedido, fechaPedido, nombreCliente, totalDecimal, estado, envio, 0L);
             //Insertamos el pedido
             pedidoService.insertar(pedido);
             //Mostramos el mensaje de exito por pantalla
@@ -90,6 +111,8 @@ public class MenuHandler {
                         ", Estado del pedido: " + p.getEstado());
                 if(p.getEnvio() != null) {
                     System.out.println(" Envio: " + p.getEnvio().toString());
+                }else {
+                    System.out.println(" (Retiro en Local)");
                 }
             }
             } catch(Exception e) {
@@ -126,7 +149,7 @@ public class MenuHandler {
             if(!totalString.isEmpty()) {
                 try {
                     double nuevoTotal = Double.parseDouble(totalString);
-                    p.setTotal(nuevoTotal);
+                    p.setTotal(new BigDecimal(nuevoTotal));
                 } catch(NumberFormatException e) {
                     System.err.println("Error: El valor ingresado no es un número válido. Se mantendrá el total anterior.");
                 }
@@ -203,31 +226,30 @@ public class MenuHandler {
         //Método para crear Envío
         public Envio crearEnvio() {
             try {
-                System.out.println("Codigo alfanumerico de tracking: ");
-                String tracking = scanner.nextLine().trim();
-                System.out.println("Costo del envio: ");
-                double costo = Double.parseDouble(scanner.nextLine().trim());
-                System.out.println("Empresa de envio (ANDREANI, OCA, CORREO_ARG)");
-                Empresa empresa = Empresa.valueOf(scanner.nextLine().trim().toUpperCase());
-                System.out.println("Tipo de envio (ESTANDAR, EXPRESS)");
-                TipoEnvio tipo = TipoEnvio.valueOf(scanner.nextLine().trim().toUpperCase());
+                String trackingCode = uniquesGenerator.generarTrackingCode();
+                System.out.print("Costo del envio: ");
+                String costoStr = scanner.nextLine().trim();
+                BigDecimal costo = new BigDecimal(costoStr);
+                System.out.print("Empresa de envio (ANDREANI, OCA, CORREO_ARG)");
+                Empresa empresa = seleccionarEmpresaEnvio();
+                TipoEnvio tipo = seleccionarTipoEnvio();
                 //Para el estado del envio, siempre comenzará por EN_PREPARACION
                 EstadoEnvio estado = EstadoEnvio.EN_PREPARACION;
                 System.out.println("Estado inicial del envio: " + estado.name());
                 //Para la fechaDespacho le ponemos por defecto 1 día despues de "hoy"
                 LocalDate fechaDespacho = LocalDate.now().plusDays(1);
-                System.out.println("Fecha del despacho (mañana): " + fechaDespacho);
+                System.out.println("Fecha del despacho: " + fechaDespacho);
                 //Para la fecha estimada le ponemos por defecto 5 días despues de "hoy"
                 LocalDate fechaEstimada = LocalDate.now().plusDays(5);
-                System.out.println("Fecha del despacho (mañana): " + fechaEstimada);
+                System.out.println("Fecha estimada de llegada: " + fechaEstimada);
             
                 //Creamos el objeto Envio con su Constructor completo.
-                Envio envio = new Envio(tracking, costo, fechaDespacho, fechaEstimada, empresa, estado, tipo, 0L);
+                Envio envio = new Envio(trackingCode, costo, fechaDespacho, fechaEstimada, empresa, estado, tipo, 0L);
                 System.out.println("Datos de Envío recopilados correctamente.");
                 return envio;
             
             } catch (NumberFormatException e) {
-                System.err.println("Error: El campo 'total' debe ser un número válido");
+                System.err.println("Error: El campo 'costo' debe ser un número válido");
                 return null;
             } catch(IllegalArgumentException e) {
                 System.err.println("Error de Enum: La empresa o el tipo de envío ingresado no es válido.");
@@ -257,6 +279,44 @@ public class MenuHandler {
                 System.out.println("Error al listar Envios " + e.getMessage());
             }
         }
+        
+        // Bucle para EmpresaEnvio
+        
+        public Empresa seleccionarEmpresaEnvio(){
+            Empresa empresa = null;
+                do {
+                    System.out.print("Empresa de envio (ANDREANI, OCA, CORREO_ARG): ");
+                    String empresaStr = scanner.nextLine(); 
+
+                    empresa = Empresa.fromString(empresaStr); 
+
+                    if (empresa == null) {
+                        System.err.println("Error: Empresa de envío no válida. Intente con: ANDREANI, OCA, o CORREO_ARG.");
+                    }
+                } while (empresa == null);
+
+            return empresa;
+        }
+
+            // Bucle para TipoEnvio
+        
+        public TipoEnvio seleccionarTipoEnvio(){
+            TipoEnvio tipo = null;
+            do {
+                System.out.print("Tipo de envio (ESTANDAR, EXPRESS): ");
+                String tipoStr = scanner.nextLine();
+
+                // Usamos el helper estático del Enum: ¡Código limpio!
+                tipo = TipoEnvio.fromString(tipoStr); 
+
+                if (tipo == null) {
+                    System.err.println("Error: Tipo de envío no válido. Intente con: ESTANDAR o EXPRESS.");
+                }
+            } while (tipo == null);
+
+            return tipo;
+        }
+        
         //Método para buscar Envios por ID
         public void buscarEnvioPorId() {
             try {
@@ -298,10 +358,10 @@ public class MenuHandler {
                 }
                 //COSTO.
                 System.out.println("Costo (actual: $" + String.format("%.2f", envio.getCosto()) + ", Enter para mantener): ");
-                String costoString = scanner.nextLine().trim();
-                if (!costoString.isEmpty()) {
+                String costoStr = scanner.nextLine().trim();
+                if (!costoStr.isEmpty()) {
                     try {
-                        envio.setCosto(Double.parseDouble(costoString));
+                        envio.setCosto(new BigDecimal(costoStr));
                     } catch (NumberFormatException e) {
                         System.err.println("Error: Costo inválido. Se mantiene el anterior.");
                     }

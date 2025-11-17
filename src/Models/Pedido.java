@@ -4,6 +4,7 @@
  */
 package Models;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -15,13 +16,13 @@ public class Pedido extends Base{
     private String numeroPedido;
     private java.time.LocalDate fecha;
     private String clienteNombre;
-    private double total;
+    private BigDecimal total;
     private Estado estado;
     private Envio envio;
 
     //Constructor completo:
 
-    public Pedido(String numero, LocalDate fecha, String clienteNombre, double total, Estado estado, Envio envio, long id) {
+    public Pedido(String numero, LocalDate fecha, String clienteNombre, BigDecimal total, Estado estado, Envio envio, long id) {
         super(id, false);
         this.numeroPedido = numero;
         this.fecha = fecha;
@@ -64,11 +65,11 @@ public class Pedido extends Base{
         this.clienteNombre = clienteNombre;
     }
 
-    public double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
@@ -96,7 +97,7 @@ public class Pedido extends Base{
     @Override
     public String toString() {
         return "Pedido{" + "ID=" + getId() + 
-                "numero=" + numeroPedido + 
+                " numero=" + numeroPedido + 
                 ", fecha=" + fecha + 
                 ", clienteNombre=" + clienteNombre + 
                 ", total=" + total + 

@@ -10,4 +10,19 @@ package Models;
  */
 public enum TipoEnvio {
     ESTANDAR, EXPRESS;
+    
+        /**
+     * Intenta convertir una cadena a TipoEnvio. Retorna el TipoEnvio 
+     * o null si la cadena no coincide.
+     */
+    public static TipoEnvio fromString(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return TipoEnvio.valueOf(text.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }

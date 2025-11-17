@@ -8,6 +8,7 @@ import Dao.EnvioDAO;
 import Dao.PedidoDAO;
 import Models.Envio;
 import Models.Pedido;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.List;
 
@@ -59,9 +60,9 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
 
             if (pedido.getEnvio() != null) {
                 Envio envio = pedido.getEnvio();
+                envio.setIdPedido(pedido.getId());
                 envioDAO.insertarTx(envio, conn); 
                 pedido.setEnvio(envio); 
-                pedidoDAO.actualizarTx(pedido, conn); 
             }
             txManager.commit();
             System.out.println("Pedido insertado correctamente.");
@@ -70,8 +71,6 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
             txManager.rollback(); 
             throw new Exception("Error transaccional al insertar el pedido: " + e.getMessage(), e); 
 
-        } finally {
-            txManager.close(); 
         }
     }
 
@@ -96,9 +95,7 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
         } catch (Exception e) {
             txManager.rollback();
             System.out.println("Error en el servicio al eliminar el pedido."+ e.getMessage());
-        } finally {
-            txManager.close(); 
-        }
+        } 
     }
         
     @Override
@@ -128,14 +125,11 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
         if (pedido.getClienteNombre() == null || pedido.getClienteNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del cliente es obligatorio.");
         }
-        if (pedido.getTotal() <= 0) {
+        if (pedido.getTotal()== null || pedido.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El total del pedido debe ser un valor positivo");
         }
         if (pedido.getEstado() == null) {
             throw new IllegalArgumentException("El estado del pedido es obligatorio.");
-        }
-        if (pedido.getEnvio() == null) {
-            throw new IllegalArgumentException("El Pedido debe tener un Envío asociado para la inserción.");
         }
         
     }

@@ -35,7 +35,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
 
     private static final String SELECT_BY_ID_SQL = SELECT_BASE + " AND p.id = ?";
     private static final String SELECT_ALL_SQL = SELECT_BASE + " ORDER BY p.fecha DESC";
-    
+    private static final String SELECT_NUMERO_PEDIDO = "SELECT numero_pedido FROM pedidos WHERE eliminado = FALSE ORDER BY numero_pedido DESC LIMIT 1";
     // Métodos para CRUD.
     @Override
     public void insertar(Pedido pedido) throws Exception {
@@ -133,7 +133,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         stmt.setDate(index++, Date.valueOf(pedido.getFecha()));
         
         stmt.setString(index++, pedido.getClienteNombre());
-        stmt.setDouble(index++, pedido.getTotal());
+        stmt.setBigDecimal(index++, pedido.getTotal());
         stmt.setString(index++, pedido.getEstado().name()); // Enum a String
         
         // Manejo de FK envio_id
@@ -178,7 +178,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             }
             pedido.setClienteNombre(rs.getString("cliente_nombre"));
             // Se lee como double y se convierte a String.
-            pedido.setTotal(rs.getDouble("total"));
+            pedido.setTotal(rs.getBigDecimal("total"));
             // Conversión de String (de la DB) a Enum (Models.Estado)
             String estadoString = rs.getString("estado");
             if (estadoString != null) {
@@ -193,7 +193,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             
             envio.setId(envioId);
             envio.setTracking(rs.getString("e.tracking"));
-            envio.setCosto(rs.getDouble("e.costo"));
+            envio.setCosto(rs.getBigDecimal("e.costo"));
             
             java.sql.Date sqlFechaDespacho = rs.getDate("e.fechaDespacho");
             if (sqlFechaDespacho != null) {
@@ -215,8 +215,21 @@ public class PedidoDAO implements GenericDAO<Pedido> {
 }
 
     @Override
-    public void insertarTx(Pedido entidad, Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void insertarTx(Pedido pedido, Connection conn) throws Exception {
+         if (conn == null) {
+             throw new IllegalArgumentException("La conexión no puede ser null.");
+         }
+       try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+
+            setPedidoParameters(stmt, pedido, 1);
+            int filasAfectadas = stmt.executeUpdate();
+
+            if (filasAfectadas == 0) {
+                 throw new Exception("Error al insertar el pedido: ninguna fila afectada.");
+            }
+
+            setGeneratedId(stmt, pedido);
+        }    
     }
 
     @Override
@@ -237,14 +250,20 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             }
         }
     }
-
-    @Override
-    public Pedido getByIdTx(long id, Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public List<Pedido> buscarPorNumeroPedido(String filtro) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
     
+    public String getLastPedidoNumber() throws Exception {
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_NUMERO_PEDIDO);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            if (rs.next()) {
+                return rs.getString("numero_pedido");
+            }
+            return null; // No hay pedidos en la DB
+            
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener el último número de pedido: " + e.getMessage(), e);
+        }
+    }
 }

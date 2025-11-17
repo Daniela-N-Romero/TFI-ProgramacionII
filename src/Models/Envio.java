@@ -4,6 +4,7 @@
  */
 package Models;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -13,16 +14,17 @@ import java.time.LocalDate;
 public class Envio extends Base{
     //Definimos los atributos:
     private String tracking;
-    private double costo;
+    private BigDecimal costo;
     private java.time.LocalDate fechaDespacho;
     private java.time.LocalDate fechaEstimada;
     private Empresa empresa;
     private EstadoEnvio estado;
     private TipoEnvio tipo;
+    private long idPedido;
     
     //Constructor completo:
 
-    public Envio(String tracking, double costo, LocalDate fechaDespacho, LocalDate fechaEstimada, Empresa empresa, EstadoEnvio estado, TipoEnvio tipo, long id) {
+    public Envio(String tracking, BigDecimal costo, LocalDate fechaDespacho, LocalDate fechaEstimada, Empresa empresa, EstadoEnvio estado, TipoEnvio tipo, long id) {
         super(id, false);
         this.tracking = tracking;
         this.costo = costo;
@@ -48,11 +50,11 @@ public class Envio extends Base{
         this.tracking = tracking;
     }
 
-    public double getCosto() {
+    public BigDecimal getCosto() {
         return costo;
     }
 
-    public void setCosto(double costo) {
+    public void setCosto(BigDecimal costo) {
         this.costo = costo;
     }
 
@@ -95,8 +97,16 @@ public class Envio extends Base{
     public void setTipo(TipoEnvio tipo) {
         this.tipo = tipo;
     }
-    
 
+    public long getIdPedido() {
+        return idPedido;
+    }
+
+    public void setIdPedido(long idPedido) {
+        this.idPedido = idPedido;
+    }
+    
+  
     @Override
     public String toString() {
         return "Envio{" + " ID=" + getId() +
@@ -109,5 +119,6 @@ public class Envio extends Base{
                 ", tipo=" + tipo +
                 ", eliminado=" + isEliminado() + '}';
     }
+
     
 }
