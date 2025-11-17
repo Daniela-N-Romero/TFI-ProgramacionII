@@ -13,7 +13,6 @@ import Models.EstadoEnvio;
 import Models.Envio;
 import Service.EnvioServiceImpl;
 import java.time.LocalDate; 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import Service.PedidoServiceImpl; 
 import java.util.List;
@@ -358,6 +357,76 @@ public class MenuHandler {
                 System.err.println("Error al eliminar el Envio" + e.getMessage());
             }
         }
+
+    public void gestionarPedidos() {
+        int opcion = -1;
+        do {
+            MenuDisplay.mostrarMenuPedidos(); // Muestra el submenú
+
+            try {
+                String entrada = scanner.nextLine().trim();
+                opcion = Integer.parseInt(entrada);
+
+                // Llama a los métodos CRUD (crearPedido, listarPedidos, etc.)
+                switch (opcion) {
+                    case 1: crearPedido(); break;
+                    case 2: listarPedidos(); break;
+                    case 3: buscarPedidoPorId(); break;
+                    case 4: actualizarPedidos(); break;
+                    case 5: eliminarPedido(); break;
+                    case 9: System.out.println("Volviendo..."); break; // Detiene el bucle interno
+                    case 0: System.exit(0); break;
+                    default: System.out.println("Opción no válida.");
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("❌ Error: Ingrese un número.");
+                opcion = -1; 
+            } // ////////////////////////////////////Capturar otras Exceptions...
+
+        } while (opcion != 9 && opcion != 0);
+    }
+
+
+public void gestionarEnvios() {
+    int opcion = -1;
+    do {
+        // 1. Muestra las opciones al usuario
+       MenuDisplay.mostrarMenuEnvios(); 
+
+        try {
+            String entrada = scanner.nextLine().trim();
+            opcion = Integer.parseInt(entrada);
+
+            switch (opcion) {
+                case 1: listarEnvios();  // Llama a listar todos los envíos
+                    break;
+                case 2: buscarEnvioPorId(); // Llama a buscar por ID
+                    break;
+                case 3:
+                    actualizarEnvio();  // Llama a actualizar datos
+                    break;
+                case 4:
+                    eliminarEnvio();    // Llama al Soft Delete
+                    break;
+                case 9:
+                    System.out.println("Volviendo al Menú Principal...");
+                    break; // Sale del bucle interno
+                case 0:
+                    System.out.println("Cerrando aplicación...");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("⚠️ Opción no válida. Intente de nuevo.");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("❌ Error: Ingrese un número válido para la opción.");
+            opcion = -1; 
+        } catch (Exception e) {
+            System.err.println("❌ Ocurrió un error inesperado en gestión de envíos: " + e.getMessage());
+        }
+
+    } while (opcion != 9 && opcion != 0);
+}
              
 }
     

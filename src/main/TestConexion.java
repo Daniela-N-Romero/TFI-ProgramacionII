@@ -12,6 +12,8 @@ package main;
 import java.sql.Connection;
 import java.sql.SQLException;
 import Config.DatabaseConnection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class TestConexion {
     public static void main(String[] args) {
@@ -23,6 +25,19 @@ public class TestConexion {
         try (Connection conn = DatabaseConnection.getConnection()) {
             if (conn != null) {
                 System.out.println("✅ Conexión establecida con éxito.");
+                
+                String sql = "SELECT * FROM pedidos";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql); 
+                    ResultSet rs = pstmt.executeQuery()) {
+                    System.out.println("📋 Listado de pedidos:");
+                    while (rs.next()) {
+                        long id = rs.getInt("id");
+                        String numero_pedido = rs.getString("numero_pedido");
+                        String cliente = rs.getString("cliente_nombre");
+                        
+                        System.out.println("ID: " + id + ", numero: " + numero_pedido + ", cliente:" + cliente);
+                    }
+                }
             } else {
                 System.out.println("❌ No se pudo establecer la conexión.");
             }

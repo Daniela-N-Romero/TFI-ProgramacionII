@@ -83,6 +83,7 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
     
    @Override
     public void eliminar(long id) {
+        validarId(id);       
         try (txManager) {
             Connection conn = txManager.getConnection();
             txManager.startTransaction();
@@ -102,10 +103,7 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
         
     @Override
     public Pedido getById(long id) throws Exception {
-        if(id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser mayor a 0");
-            
-        }
+        validarId(id);  
         return pedidoDAO.getById(id);
     }
     
@@ -153,6 +151,12 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
 //            
 //        }
  }
+
+    private void validarId(long id){
+        if(id <= 0){
+            throw new NumberFormatException("La id deber ser mayor a 0.");
+        }
+    }
 }
     
     

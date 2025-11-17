@@ -16,7 +16,9 @@ import java.util.List;
  */
 public class EnvioDAO implements GenericDAO<Envio> {
 
-    
+    public EnvioDAO() {
+    }
+
     private static final String DELETE_BY_PEDIDO_SQL = "UPDATE envios SET eliminado = 1 WHERE id_pedido = ?"; // Soft Delete Cascada si se elimina el pedido
     
     

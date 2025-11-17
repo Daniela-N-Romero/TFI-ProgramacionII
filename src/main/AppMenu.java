@@ -42,16 +42,42 @@ public class AppMenu {
         while (running) {
             try {
                 MenuDisplay.mostrarMenuPrincipal();
-                int opcion = Integer.parseInt(scanner.nextLine());
-                processOption(opcion);
+                int eleccionMain = Integer.parseInt(scanner.nextLine());
+                processMainOption(eleccionMain);
             } catch (NumberFormatException e) {
                 System.out.println("Entrada invalida. Por favor, ingrese un numero.");
             }
         }
         scanner.close();
     }
+    
+    private void processMainOption(int opcion) {
+        switch (opcion) {
+            case 1 -> menuHandler.gestionarPedidos();
+            case 2 -> menuHandler.gestionarEnvios();
+            case 0 -> {
+                System.out.println("Saliendo...");
+                running = false;
+            }
+            default -> System.out.println("Opcion no valida.");
+        }
+    }
 
-    private void processOption(int opcion) {
+    private void processPedidosOption(int opcion) {
+        switch (opcion) {
+            case 1 -> menuHandler.crearPedido();
+            case 2 -> menuHandler.listarPedidos();
+            case 3 -> menuHandler.actualizarPedidos();
+            case 4 -> menuHandler.eliminarPedido();
+            case 0 -> {
+                System.out.println("Saliendo...");
+                running = false;
+            }
+            default -> System.out.println("Opcion no valida.");
+        }
+    }
+    
+        private void processEnviosOption(int opcion) {
         switch (opcion) {
             case 1 -> menuHandler.crearPedido();
             case 2 -> menuHandler.listarPedidos();

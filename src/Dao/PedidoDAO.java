@@ -185,29 +185,29 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                 pedido.setEstado(Estado.valueOf(estadoString));
             }
             // 2. Mapeo de Envío (Eager Loading)
-            long envioId = rs.getLong("e_id"); // e_id viene del SELECT_BASE
+            long envioId = rs.getLong("e.id"); // e_id viene del SELECT_BASE
             // rs.wasNull() comprueba si el valor leído (e_id) era NULL en la BD
             if (!rs.wasNull()) { 
                 Envio envio = new Envio();
             
             
             envio.setId(envioId);
-            envio.setTracking(rs.getString("tracking"));
-            envio.setCosto(rs.getDouble("costo"));
+            envio.setTracking(rs.getString("e.tracking"));
+            envio.setCosto(rs.getDouble("e.costo"));
             
-            java.sql.Date sqlFechaDespacho = rs.getDate("fechaDespacho");
+            java.sql.Date sqlFechaDespacho = rs.getDate("e.fechaDespacho");
             if (sqlFechaDespacho != null) {
                 envio.setFechaDespacho(sqlFechaDespacho.toLocalDate());
             }
-            java.sql.Date sqlFechaEstimada = rs.getDate("fechaEstimada");
+            java.sql.Date sqlFechaEstimada = rs.getDate("e.fechaEstimada");
             if (sqlFechaEstimada != null) {
                 envio.setFechaEstimada(sqlFechaEstimada.toLocalDate());
             }
             
             // Mapeo de Enums de Envío (asumo que están en Models)
-            envio.setEmpresa(Empresa.valueOf(rs.getString("empresa")));
-            envio.setEstado(EstadoEnvio.valueOf(rs.getString("e_estado"))); 
-            envio.setTipo(TipoEnvio.valueOf(rs.getString("tipo")));
+            envio.setEmpresa(Empresa.valueOf(rs.getString("e.empresa")));
+            envio.setEstado(EstadoEnvio.valueOf(rs.getString("e.estado"))); 
+            envio.setTipo(TipoEnvio.valueOf(rs.getString("e.tipo")));
 
             pedido.setEnvio(envio);
         }
