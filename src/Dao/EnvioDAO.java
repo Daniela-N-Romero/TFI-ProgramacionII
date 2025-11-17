@@ -18,7 +18,7 @@ import java.util.ArrayList;
 /**
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public class EnvioDAO implements GenericDAO<Envio> {
 
@@ -29,7 +29,11 @@ public class EnvioDAO implements GenericDAO<Envio> {
     private static final String GET_ALL_SQL = "SELECT * FROM envios WHERE eliminado = 0";
     private static final String SOFT_DELETE_BY_PEDIDO_SQL = "UPDATE envios SET eliminado = 1 WHERE id_pedido = ?";
     private static final String VERIFICAR_TRACKING = "SELECT COUNT(*) FROM envios WHERE tracking = ? AND eliminado = FALSE";
-    
+    private static final String RESTORE_ELIMINADO = "UPDATE pedidos SET eliminado = 0 WHERE id = ?";
+    private static final String SELECT_ELIMINADOS = "SELECT e.* , p.* " + 
+            "FROM envios e LEFT JOIN pedidos p ON p.id = e.id_pedido " +
+            "WHERE e.eliminado = 1";
+
     
  // --- Mapeo de Resultados ---
 
@@ -250,6 +254,34 @@ public class EnvioDAO implements GenericDAO<Envio> {
             throw new Exception("Error al verificar la unicidad del tracking: " + e.getMessage(), e);
         }
     }
+
+     @Override
+    public List<Envio> getEliminados() throws SQLException {
+    List<Envio> enviosEliminados = new ArrayList<>();
     
-      
+    try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_ELIMINADOS);
+             ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            enviosEliminados.add(mapResultSetToEnvio(rs)); 
+        }
+    } 
+    return enviosEliminados;
+    }
+    
+    @Override
+    public void restaurarEliminadoTx(long idEnvio, Connection conn) throws Exception {
+    if (conn == null) throw new IllegalArgumentException("La conexión transaccional no puede ser null.");
+    int filasAfectadas = 0;
+
+    try (PreparedStatement stmt = conn.prepareStatement(RESTORE_ELIMINADO)) {
+        stmt.setLong(1, idEnvio);
+        filasAfectadas = stmt.executeUpdate();
+    }
+    if (filasAfectadas == 0) {
+         throw new Exception("Error al actualizar el envio: ninguna fila afectada.");
+    }
+    }
+
 }

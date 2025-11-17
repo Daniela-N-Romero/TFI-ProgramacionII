@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  * @param <T>
  */
 public interface GenericDAO<T> {
@@ -24,6 +24,10 @@ public interface GenericDAO<T> {
     
     List<T> getAll() throws Exception;
     
+    List<T> getEliminados() throws Exception;
+    
+
+    
     // --- MÉTODOS CRUD TRANSACCIONALES (Requieren Connection externa) ---
     // Usados por la capa Service para agrupar múltiples operaciones
     void insertarTx(T entidad, Connection conn) throws Exception;
@@ -31,5 +35,7 @@ public interface GenericDAO<T> {
     void actualizarTx(T entidad, Connection conn) throws Exception;
 
     void eliminarTx(long id, Connection conn) throws Exception;
+    
+    void restaurarEliminadoTx(long id, Connection conn) throws Exception;
     
 }

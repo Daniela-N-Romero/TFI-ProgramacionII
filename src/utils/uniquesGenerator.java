@@ -4,7 +4,10 @@ import Dao.PedidoDAO;
 import Dao.EnvioDAO;
 import java.util.Random;
 
-
+/**
+ *
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
+ */
 
 public class uniquesGenerator {
 

@@ -21,7 +21,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public class PedidoDAO implements GenericDAO<Pedido> {
     //Queries SQL:
@@ -36,7 +36,12 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     private static final String SELECT_BY_ID_SQL = SELECT_BASE + " AND p.id = ?";
     private static final String SELECT_ALL_SQL = SELECT_BASE + " ORDER BY p.fecha DESC";
     private static final String SELECT_NUMERO_PEDIDO = "SELECT numero_pedido FROM pedidos WHERE eliminado = FALSE ORDER BY numero_pedido DESC LIMIT 1";
-    // Métodos para CRUD.
+    private static final String SELECT_ELIMINADOS = "SELECT p.*, " + "e.* " + 
+            "FROM pedidos p LEFT JOIN envios e ON p.id = e.id_pedido " +
+            "WHERE p.eliminado = 1";
+    private static final String RESTORE_ELIMINADO = "UPDATE pedidos SET eliminado = 0 WHERE id = ?";
+
+// Métodos para CRUD.
     @Override
     public void insertar(Pedido pedido) throws Exception {
         try (Connection conn = DatabaseConnection.getConnection();
@@ -292,4 +297,34 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             throw new Exception("Error al obtener el último número de pedido: " + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public List<Pedido> getEliminados() throws SQLException {
+    List<Pedido> pedidosEliminados = new ArrayList<>();
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_ELIMINADOS);
+             ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            pedidosEliminados.add(mapResultSetToPedido(rs)); 
+        }
+    } 
+    return pedidosEliminados;
+    }
+    
+    @Override
+    public void restaurarEliminadoTx(long idPedido, Connection conn) throws Exception {
+        if (conn == null) throw new IllegalArgumentException("La conexión transaccional no puede ser null.");
+        int filasAfectadas = 0;
+
+        try (PreparedStatement stmt = conn.prepareStatement(RESTORE_ELIMINADO)) {
+            stmt.setLong(1, idPedido);
+            filasAfectadas = stmt.executeUpdate();
+        }
+        if (filasAfectadas == 0) {
+             throw new Exception("Error al actualizar el pedido: ninguna fila afectada.");
+        }
+    }
+    
 }

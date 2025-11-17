@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public class Envio extends Base{
     //Definimos los atributos:

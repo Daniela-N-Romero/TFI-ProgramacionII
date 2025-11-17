@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 
 

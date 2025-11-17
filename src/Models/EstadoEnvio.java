@@ -6,7 +6,7 @@ package Models;
 
 /**
  *
- * @author Esteban
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public enum EstadoEnvio {
     EN_PREPARACION, EN_TRANSITO, ENTREGADO;

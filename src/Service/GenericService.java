@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  * @param <T>
  */
 public interface GenericService<T> {

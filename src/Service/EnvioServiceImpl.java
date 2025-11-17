@@ -13,14 +13,9 @@ import java.util.List;
 import java.sql.Connection;
 
 
-
-
-
-
-
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public class EnvioServiceImpl implements GenericService<Envio> {
     
@@ -50,7 +45,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if(envio.getIdPedido() <= 0){
             throw new IllegalArgumentException("Error de Regla de Negocio: El Envío debe tener un ID de Pedido asociado y válido.");
         }
-        try (txManager) { 
+        try  { 
             
             Connection conn = txManager.getConnection(); // Obtiene la conexión
             txManager.startTransaction();            // Inicia la transacción (auto-commit=false)

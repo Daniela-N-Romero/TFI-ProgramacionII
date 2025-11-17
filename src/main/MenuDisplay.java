@@ -6,7 +6,7 @@ package main;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public class MenuDisplay {
     
@@ -24,11 +24,13 @@ public class MenuDisplay {
     
     public static void mostrarMenuPedidos() {
     System.out.println("\n===== GESTIÓN DE PEDIDOS =====");
-    System.out.println("1. Insertar nuevo Pedido (y Envío opcional)"); //Listo
-    System.out.println("2. Listar todos los Pedidos"); //Listo
-    System.out.println("3. Buscar Pedido por ID"); //Listo
-    System.out.println("4. Actualizar datos del Pedido"); //Listo
-    System.out.println("5. Eliminar Pedido (Soft Delete)"); //Listo
+    System.out.println("1. Insertar nuevo Pedido (y Envío opcional)"); 
+    System.out.println("2. Listar todos los Pedidos"); 
+    System.out.println("3. Buscar Pedido por ID"); 
+    System.out.println("4. Actualizar datos del Pedido");
+    System.out.println("5. Eliminar Pedido (Soft Delete)"); 
+    System.out.println("6. Listar Pedidos eliminados(Soft Delete)"); 
+    System.out.println("7. Restaurar Pedido"); 
     System.out.println("9. Volver al Menu Principal");
     System.out.println("0. Salir de la Aplicación");
     System.out.print("Ingrese una opcion: ");

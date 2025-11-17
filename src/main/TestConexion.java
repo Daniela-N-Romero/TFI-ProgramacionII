@@ -6,7 +6,7 @@ package main;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 
 import java.sql.Connection;

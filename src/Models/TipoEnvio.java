@@ -6,7 +6,7 @@ package Models;
 
 /**
  *
- * @author Esteban
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public enum TipoEnvio {
     ESTANDAR, EXPRESS;

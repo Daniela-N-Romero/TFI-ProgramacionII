@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 
 
@@ -51,7 +51,7 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
    @Override
 public void insertar(Pedido pedido) throws Exception {
     validatePedido(pedido);
-    try (txManager) {
+    try  {
         Connection conn = txManager.getConnection();
         txManager.startTransaction();
         
@@ -102,9 +102,9 @@ public void insertar(Pedido pedido) throws Exception {
         
     
    @Override
-    public void eliminar(long id) {
+    public void eliminar(long id){
         validarId(id);       
-        try (txManager) {
+        try {
             Connection conn = txManager.getConnection();
             txManager.startTransaction();
             
@@ -113,10 +113,12 @@ public void insertar(Pedido pedido) throws Exception {
 
             txManager.commit();
             
-        } catch (Exception e) {
+        } catch(NumberFormatException e) {
+                System.err.println("Error: El ID debe ser un número válido.");
+        } catch (Exception e) { 
             txManager.rollback();
-            System.out.println("Error en el servicio al eliminar el pedido."+ e.getMessage());
-        } 
+            System.err.println("Error al eliminar Pedido: " + e.getMessage());
+        }
     }
         
     @Override
@@ -131,6 +133,29 @@ public void insertar(Pedido pedido) throws Exception {
     @Override
     public List getAll() throws Exception {
         return pedidoDAO.getAll();
+    }
+    
+    public  List<Pedido> obtenerPedidosEliminados() throws Exception {
+        return pedidoDAO.getEliminados();
+    }
+    
+    public boolean activarPedido(long idPedido) throws Exception {
+        validarId(idPedido);
+         try {
+            Connection conn = txManager.getConnection();
+            txManager.startTransaction();
+            
+            pedidoDAO.restaurarEliminadoTx(idPedido,conn);  // Usa el DAO inyectado
+            envioDAO.restaurarEliminadoTx(idPedido,conn);// Usa el DAO inyectado
+
+            txManager.commit();
+            
+        } catch (Exception e) {
+            txManager.rollback();
+            System.out.println("Error en el servicio al activar el pedido."+ e.getMessage());
+        } 
+
+        return true;
     }
     
         
@@ -154,24 +179,15 @@ public void insertar(Pedido pedido) throws Exception {
         }
         
     }
-    //Valida que el 'numero' del pedido sea único en el sistema
-    //PedidoDAO tiene un método para buscar por 'numero'
-    private void validatePedidoUnique(String numero, long pedidoId) throws Exception {
-//        Pedido existente = 
-//        if (existente != null) {
-//            if (pedidoId == null || !pedidoId.equals(Long.valueOf(existente.getId()))) {
-//                throw new IllegalArgumentException("Ya existe un pedido con el número: " + numero);
-//                
-//            }
-//            
-//        }
- }
 
     private void validarId(long id){
         if(id <= 0){
             throw new NumberFormatException("La id deber ser mayor a 0.");
         }
     }
+    
+
+    
 }
     
     

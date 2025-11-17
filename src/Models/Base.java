@@ -6,7 +6,7 @@ package Models;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public abstract class Base {
     //Definimos atributos que serán comunes a todas las clases:

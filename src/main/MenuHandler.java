@@ -21,7 +21,7 @@ import utils.uniquesGenerator;
 
 /**
  *
- * @author Daniela Nahir Romero
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
  */
 public class MenuHandler {
     
@@ -76,8 +76,11 @@ public class MenuHandler {
                 System.out.println("-------------------------------------------------------------");
                 return;
             }
+        
         } else {
+            
             System.out.println("El pedido se generará para retiro en local (sin Envío).");
+            
         }
         
         // Instanciar Pedido (usando constructor sin ID o pasando 0L, pero dejando que el DAO lo sobrescriba)
@@ -90,9 +93,9 @@ public class MenuHandler {
         System.out.println("✅ Pedido creado exitosamente con ID: " + pedido.getId());
         
     } catch (NumberFormatException e) {
-        System.err.println("❌ Error: El campo 'total' debe ser un número válido.");
+        System.err.println("Error: El campo 'total' debe ser un número válido.");
     } catch (Exception e) {
-        System.err.println("❌ Error al crear el pedido: " + e.getMessage());
+        System.err.println("Error al crear el pedido: " + e.getMessage());
     }
 }
     
@@ -187,7 +190,7 @@ public class MenuHandler {
                 pedidoService.eliminar(id);
                 System.out.println("Pedido eliminado exitosamente.");
             } catch(NumberFormatException e) {
-                System.err.println("Error al eliminar Pedido" + e.getMessage());
+                    System.err.println("Error al eliminar Pedido" + e.getMessage());
             }
         }
         
@@ -218,9 +221,9 @@ public class MenuHandler {
                 }
                 System.out.println("---------------------------------");
             } catch(NumberFormatException e) {
-                System.err.println("❌ Error: El ID ingresado debe ser un número entero válido.");
+                System.err.println("Error: El ID ingresado debe ser un número entero válido.");
             } catch (Exception e) {
-                System.err.println("❌ Error al buscar pedido: " + e.getMessage());
+                System.err.println("Error al buscar pedido: " + e.getMessage());
             }
         }
     
@@ -436,18 +439,57 @@ public class MenuHandler {
                     case 3: buscarPedidoPorId(); break;
                     case 4: actualizarPedidos(); break;
                     case 5: eliminarPedido(); break;
+                    case 6: mostrarPedidosEliminados(); break;
+                    case 7: restaurarPedidoUsuario(); break;
                     case 9: System.out.println("Volviendo..."); break; // Detiene el bucle interno
                     case 0: System.exit(0); break;
                     default: System.out.println("Opción no válida.");
                 }
             } catch (NumberFormatException e) {
-                System.err.println("❌ Error: Ingrese un número.");
+                System.err.println("Error: Ingrese un número.");
                 opcion = -1; 
-            } // ////////////////////////////////////Capturar otras Exceptions...
+            } 
 
         } while (opcion != 9 && opcion != 0);
     }
 
+ private void mostrarPedidosEliminados() {
+    try {
+        System.out.println("\n*** LISTA DE PEDIDOS ELIMINADOS (Soft Delete) ***");
+        List<Pedido> eliminados = pedidoService.obtenerPedidosEliminados();
+        
+        if (eliminados.isEmpty()) {
+            System.out.println("No hay pedidos marcados como eliminados.");
+            return;
+        }
+        
+        for (Pedido p : eliminados) {
+            System.out.println("ID: " + p.getId() + ", Número: " + p.getNumero() + ", Cliente: " + p.getClienteNombre());
+        }
+    } catch (Exception e) {
+        System.err.println("Error al recuperar pedidos eliminados: " + e.getMessage());
+    }
+}
+
+private void restaurarPedidoUsuario() {
+    try {
+        System.out.print("Ingrese el ID del pedido a restaurar: ");
+        String idStr = scanner.nextLine().trim(); 
+        long id = Long.parseLong(idStr);
+        
+        if (pedidoService.activarPedido(id)) {
+            System.out.println("Pedido ID " + id + " restaurado y ahora está activo (eliminado = 0).");
+        } else {
+            System.out.println("No se pudo restaurar el pedido ID " + id + ". Verifique que el ID exista y esté eliminado.");
+        }
+    } catch (NumberFormatException nfe) {
+        System.err.println("Error: Ingrese un número válido para el ID.");
+    } catch (Exception e) {
+        // Esto manejará la excepción del servicio o del DAO
+        System.err.println("Error al restaurar el pedido: " + e.getMessage());
+    }
+}
+  
 
 public void gestionarEnvios() {
     int opcion = -1;
@@ -460,35 +502,61 @@ public void gestionarEnvios() {
             opcion = Integer.parseInt(entrada);
 
             switch (opcion) {
-                case 1: listarEnvios();  // Llama a listar todos los envíos
-                    break;
-                case 2: buscarEnvioPorId(); // Llama a buscar por ID
-                    break;
-                case 3:
-                    actualizarEnvio();  // Llama a actualizar datos
-                    break;
-                case 4:
-                    eliminarEnvio();    // Llama al Soft Delete
-                    break;
-                case 9:
-                    System.out.println("Volviendo al Menú Principal...");
-                    break; // Sale del bucle interno
-                case 0:
-                    System.out.println("Cerrando aplicación...");
-                    System.exit(0);
-                    break;
+                case 1: listarEnvios(); break;
+                case 2: buscarEnvioPorId();  break;
+                case 3: actualizarEnvio();  break;
+                case 4: eliminarEnvio();  break;
+                case 5: mostrarEnviosEliminados(); break;
+                case 6: restaurarEnvioUsuario();break;
+                case 9: System.out.println("Volviendo al Menú Principal..."); break;
+                case 0: System.out.println("Cerrando aplicación...");
+                        System.exit(0);
+                        break;
                 default:
-                    System.out.println("⚠️ Opción no válida. Intente de nuevo.");
+                        System.out.println("⚠️ Opción no válida. Intente de nuevo.");
             }
         } catch (NumberFormatException e) {
-            System.err.println("❌ Error: Ingrese un número válido para la opción.");
+            System.err.println("Error: Ingrese un número válido para la opción.");
             opcion = -1; 
         } catch (Exception e) {
-            System.err.println("❌ Ocurrió un error inesperado en gestión de envíos: " + e.getMessage());
+            System.err.println("Ocurrió un error inesperado en gestión de envíos: " + e.getMessage());
         }
 
     } while (opcion != 9 && opcion != 0);
 }
-             
+
+ private void mostrarEnviosEliminados() {
+    try {
+        System.out.println("\n*** LISTA DE PEDIDOS ELIMINADOS (Soft Delete) ***");
+        List<Pedido> eliminados = pedidoService.obtenerPedidosEliminados();
+        
+        if (eliminados.isEmpty()) {
+            System.out.println("No hay pedidos marcados como eliminados.");
+            return;
+        }
+        
+        for (Pedido p : eliminados) {
+            System.out.println("ID: " + p.getId() + ", Número: " + p.getNumero() + ", Cliente: " + p.getClienteNombre());
+        }
+    } catch (Exception e) {
+        System.err.println("Error al recuperar pedidos eliminados: " + e.getMessage());
+    }
+}
+
+private void restaurarEnvioUsuario() {
+    try {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ingrese el ID del envio a restaurar: ");
+        long id = scanner.nextLong();
+        
+        if (pedidoService.activarPedido(id)) {
+            System.out.println("Pedido ID " + id + " restaurado y ahora está activo (eliminado = 0).");
+        } else {
+            System.out.println("No se pudo restaurar el pedido ID " + id + ". Verifique que el ID exista y esté eliminado.");
+        }
+    } catch (Exception e) {
+        System.err.println("Error al restaurar el pedido: " + e.getMessage());
+    }
+}     
 }
     
