@@ -11,6 +11,8 @@ package Models;
 public enum Empresa {
     ANDREANI, OCA, CORREO_ARG;
     
+    
+
         public static Empresa fromString(String text) {
         if (text == null || text.trim().isEmpty()) {
             return null;

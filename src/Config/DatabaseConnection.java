@@ -30,6 +30,8 @@ public class DatabaseConnection {
         }
     }
 
+    public DatabaseConnection(){
+    }
     /**
      * 🔹 Método para obtener una conexión a la base de datos.
      * @return Connection si la conexión es exitosa.

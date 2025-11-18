@@ -11,6 +11,7 @@ package Models;
 public enum EstadoEnvio {
     EN_PREPARACION, EN_TRANSITO, ENTREGADO;
     
+
     public static EstadoEnvio fromString(String text) {
         if (text == null || text.trim().isEmpty()) {
             return null;

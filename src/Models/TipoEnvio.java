@@ -10,7 +10,7 @@ package Models;
  */
 public enum TipoEnvio {
     ESTANDAR, EXPRESS;
-    
+
         /**
      * Intenta convertir una cadena a TipoEnvio. Retorna el TipoEnvio 
      * o null si la cadena no coincide.

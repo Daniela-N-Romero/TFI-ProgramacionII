@@ -34,6 +34,8 @@ public class EnvioDAO implements GenericDAO<Envio> {
             "FROM envios e LEFT JOIN pedidos p ON p.id = e.id_pedido " +
             "WHERE e.eliminado = 1";
 
+
+
     
  // --- Mapeo de Resultados ---
 
@@ -69,28 +71,30 @@ public class EnvioDAO implements GenericDAO<Envio> {
     }
 
     @Override
-    public void actualizar(Envio entidad) throws Exception {
+    public void actualizar(Envio envio) throws Exception {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
+   //UPDATE_SQL = "UPDATE envios SET tracking = ?, empresa = ?, tipo = ?, costo = ?, fechaDespacho = ?,
+   //fechaEstimada = ?, estado = ?, id_pedido = ? WHERE id = ?";
 
-            stmt.setString(1, entidad.getTracking());
-            stmt.setString(2, entidad.getEmpresa().name());
-            stmt.setString(3, entidad.getTipo().name());
-            stmt.setBigDecimal(4, entidad.getCosto());
-            stmt.setDate(5, java.sql.Date.valueOf(entidad.getFechaDespacho()));
+            stmt.setString(1, envio.getTracking());
+            stmt.setString(2, envio.getEmpresa().name());
+            stmt.setString(3, envio.getTipo().name());
+            stmt.setBigDecimal(4, envio.getCosto());
+            stmt.setDate(5, java.sql.Date.valueOf(envio.getFechaDespacho()));
             
-            if (entidad.getFechaEstimada() != null) {
-                stmt.setDate(6, java.sql.Date.valueOf(entidad.getFechaEstimada()));
+            if (envio.getFechaEstimada() != null) {
+                stmt.setDate(6, java.sql.Date.valueOf(envio.getFechaEstimada()));
             } else {
                 stmt.setNull(6, java.sql.Types.DATE);
             }
             
-            stmt.setString(7, entidad.getEstado().name());
-            stmt.setLong(8, entidad.getIdPedido()); 
-            stmt.setLong(9, entidad.getId());   
+            stmt.setString(7, envio.getEstado().name());
+            stmt.setLong(8, envio.getIdPedido()); 
+            stmt.setLong(9, envio.getId());   
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("No se encontró el Envío con ID: " + entidad.getId() + " para actualizar.");
+                throw new SQLException("No se encontró el Envío con ID: " + envio.getId() + " para actualizar.");
             }
         } catch (SQLException e) {
             throw new Exception("Error al actualizar el Envío: " + e.getMessage(), e);
@@ -209,8 +213,8 @@ public class EnvioDAO implements GenericDAO<Envio> {
             }
             
             stmt.setString(7, envio.getEstado().name());
-            stmt.setLong(8, envio.getId()); // WHERE id = ?
-            
+            stmt.setLong(8, envio.getIdPedido()); // WHERE id = ?
+            stmt.setLong(9, envio.getId());
             stmt.executeUpdate();
             
         } catch (SQLException e) {

@@ -3,11 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Service;
+import Config.DatabaseConnection;
 import Config.TransactionManager;
 import Dao.EnvioDAO;
-import Dao.PedidoDAO;
 import Models.Envio;
-import Service.GenericService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.sql.Connection;
@@ -20,19 +19,14 @@ import java.sql.Connection;
 public class EnvioServiceImpl implements GenericService<Envio> {
     
     private final EnvioDAO envioDAO;
-    private final TransactionManager txManager; 
-    
+  
     //constructor
-    public EnvioServiceImpl(EnvioDAO envioDAO, TransactionManager txManager) {
+    public EnvioServiceImpl(EnvioDAO envioDAO){
         if(envioDAO == null) {
             throw new IllegalArgumentException ("EnvioDAO no puede ser null");
         }
-        if (txManager == null){
-            throw new IllegalArgumentException("TransactionManager no puede ser null");
-        }
-        
+                
         this.envioDAO = envioDAO;
-        this.txManager = txManager;
     }
     
     //Inserta un nuevo envio en la base de datos.
@@ -45,11 +39,12 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if(envio.getIdPedido() <= 0){
             throw new IllegalArgumentException("Error de Regla de Negocio: El Envío debe tener un ID de Pedido asociado y válido.");
         }
-        try  { 
-            
-            Connection conn = txManager.getConnection(); // Obtiene la conexión
-            txManager.startTransaction();            // Inicia la transacción (auto-commit=false)
-            
+        try (TransactionManager txManager = 
+         new TransactionManager(DatabaseConnection.getConnection())) {
+        
+            txManager.startTransaction();
+            Connection conn = txManager.getConnection();      // Inicia la transacción (auto-commit=false)
+
             // Llama al DAO para insertar el Envío. 
             // Esto usa el método que acepta la conexión, garantizando atomicidad.
             envioDAO.insertarTx(envio, conn); 
@@ -58,7 +53,6 @@ public class EnvioServiceImpl implements GenericService<Envio> {
             System.out.println("Envío insertado correctamente.");
             
         } catch (Exception e) {
-            txManager.rollback(); // Deshace si algo falla
             throw new Exception("Error transaccional al insertar el envío: " + e.getMessage(), e);
         }
     }
@@ -66,10 +60,19 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         @Override
         public void actualizar(Envio envio) throws Exception {
             validateEnvio(envio);
-            if(envio.getId()<= 0){
-            throw new IllegalArgumentException("El ID del envio debe ser mayor a 0 para actualizar");
+        try (TransactionManager txManager = 
+           new TransactionManager(DatabaseConnection.getConnection())) {
+
+           txManager.startTransaction();
+           Connection conn = txManager.getConnection(); 
+
+           envioDAO.actualizarTx(envio, conn); // ⭐️ Llamar al método Tx
+           txManager.commit();
+           System.out.println("Envío con ID " + envio.getId() + " actualizado correctamente.");
+
+        } catch (Exception e) {
+            throw new Exception("Error transaccional al actualizar el envío: " + e.getMessage(), e);
         }
-        envioDAO.actualizar(envio);
     }
 
         //Elimina lógicamente un envio

@@ -4,15 +4,11 @@
  */
 package main;
 
-import Config.DatabaseConnection;
-import Config.TransactionManager;
 import Dao.EnvioDAO;
 import Dao.PedidoDAO;
 import Service.EnvioServiceImpl;
 import Service.PedidoServiceImpl;
-import java.sql.Connection;
 import java.util.Scanner;
-import java.sql.SQLException;
 import utils.uniquesGenerator;
 
 /**
@@ -29,11 +25,7 @@ public class AppMenu {
     private uniquesGenerator uniquesGenerator;
 
     public AppMenu(){
-        try {
-            initializeServices();
-        } catch (SQLException ex) {
-            System.out.println("Error al iniciar los servicios"+ ex.getMessage());
-        }
+        initializeServices();
         this.scanner = new Scanner(System.in);
         this.menuHandler = new MenuHandler(this.scanner, this.pedidoService, this.envioService, this.uniquesGenerator);
         this.running = true;
@@ -66,18 +58,14 @@ public class AppMenu {
         }
     }
 
-     private void initializeServices() throws SQLException {
+     private void initializeServices() {
         // 1. Capa DAO
         EnvioDAO envioDAO = new EnvioDAO();
         PedidoDAO pedidoDAO = new PedidoDAO();
 
-        // 2. Capa Config/Transacciones
-        Connection conn = DatabaseConnection.getConnection();
-        TransactionManager txManager = new TransactionManager(conn);
-
-        // 3. Capa Service y asignación a campos 
-        this.envioService = new EnvioServiceImpl(envioDAO, txManager); 
-        this.pedidoService = new PedidoServiceImpl(pedidoDAO, envioDAO, txManager); 
+        // 2. Capa Service y asignación a campos 
+        this.envioService = new EnvioServiceImpl(envioDAO); 
+        this.pedidoService = new PedidoServiceImpl(pedidoDAO, envioDAO); 
         this.uniquesGenerator = new uniquesGenerator(pedidoDAO,envioDAO);
     }
     

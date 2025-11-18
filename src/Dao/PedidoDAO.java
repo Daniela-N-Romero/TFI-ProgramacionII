@@ -41,6 +41,8 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             "WHERE p.eliminado = 1";
     private static final String RESTORE_ELIMINADO = "UPDATE pedidos SET eliminado = 0 WHERE id = ?";
 
+
+    
 // Métodos para CRUD.
     @Override
     public void insertar(Pedido pedido) throws Exception {

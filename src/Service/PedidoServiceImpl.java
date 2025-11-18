@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Service;
+import Config.DatabaseConnection;
 import Config.TransactionManager;
 import Dao.EnvioDAO;
 import Dao.PedidoDAO;
@@ -25,36 +26,28 @@ public class PedidoServiceImpl implements GenericService<Pedido> {
     // 1. Declarar las dependencias como final (siempre inicializadas)
     private final PedidoDAO pedidoDAO;
     private final EnvioDAO envioDAO;
-    // Asumiendo que TransactionManager también es una dependencia
-    private final TransactionManager txManager; 
 
-    // 2. Constructor para inyectar las dependencias
-    // Se asegura que una instancia de PedidoServiceImpl siempre tendrá sus DAOs y su gestor de transacciones.
-    public PedidoServiceImpl(PedidoDAO pedidoDAO, EnvioDAO envioDAO, TransactionManager txManager) {
-          if (pedidoDAO == null){
+    public PedidoServiceImpl(PedidoDAO pedidoDAO, EnvioDAO envioDAO) {
+        if (pedidoDAO == null){
             throw new IllegalArgumentException("PedidoDAO no puede ser null");
          }
         if (envioDAO == null){
             throw new IllegalArgumentException("EnvioDAO no puede ser null");
         }
-        
-        if (txManager == null){
-            throw new IllegalArgumentException("TransactionManager no puede ser null");
-        }
-        
         this.pedidoDAO = pedidoDAO;
         this.envioDAO = envioDAO;
-        this.txManager = txManager;
+
     }
     
     
    @Override
 public void insertar(Pedido pedido) throws Exception {
     validatePedido(pedido);
-    try  {
-        Connection conn = txManager.getConnection();
-        txManager.startTransaction();
+    try (TransactionManager txManager = 
+         new TransactionManager(DatabaseConnection.getConnection())) {
         
+        txManager.startTransaction();
+        Connection conn = txManager.getConnection();
         // Insertar Pedido y obtener su ID generado.
         pedidoDAO.insertarTx(pedido, conn);
 
@@ -74,7 +67,6 @@ public void insertar(Pedido pedido) throws Exception {
         System.out.println("Pedido insertado correctamente.");
         
     } catch (Exception e) {
-        txManager.rollback();
         throw new Exception("Error transaccional al insertar el pedido: " + e.getMessage(), e);
     }
 }
@@ -84,9 +76,11 @@ public void insertar(Pedido pedido) throws Exception {
         // validatePedido(pedido); // Asumiendo que tienes un método de validación
     
         // Usamos el TransactionManager para garantizar la gestión correcta de la conexión.
-        try (txManager) { 
-            Connection conn = txManager.getConnection();
-            txManager.startTransaction(); // Opcional, si el DAO lo requiere para setear auto-commit=false
+       try (TransactionManager txManager = 
+         new TransactionManager(DatabaseConnection.getConnection())) {
+        
+        txManager.startTransaction();
+        Connection conn = txManager.getConnection(); // Opcional, si el DAO lo requiere para setear auto-commit=false
         
             // 1. Llama al DAO para ejecutar el UPDATE
             pedidoDAO.actualizarTx(pedido, conn); 
@@ -95,7 +89,6 @@ public void insertar(Pedido pedido) throws Exception {
             System.out.println("Pedido con ID " + pedido.getId() + " actualizado correctamente.");
         
         } catch (Exception e) {
-            txManager.rollback(); // 3. Deshace si algo falla
             throw new Exception("Error transaccional al actualizar el pedido: " + e.getMessage(), e);
         }
     }
@@ -104,9 +97,11 @@ public void insertar(Pedido pedido) throws Exception {
    @Override
     public void eliminar(long id){
         validarId(id);       
-        try {
-            Connection conn = txManager.getConnection();
-            txManager.startTransaction();
+        try (TransactionManager txManager = 
+         new TransactionManager(DatabaseConnection.getConnection())) {
+        
+        txManager.startTransaction();
+        Connection conn = txManager.getConnection();
             
             pedidoDAO.eliminarTx(id,conn); // Usa el DAO inyectado
             envioDAO.eliminarTx(id,conn); // Usa el DAO inyectado
@@ -116,7 +111,6 @@ public void insertar(Pedido pedido) throws Exception {
         } catch(NumberFormatException e) {
                 System.err.println("Error: El ID debe ser un número válido.");
         } catch (Exception e) { 
-            txManager.rollback();
             System.err.println("Error al eliminar Pedido: " + e.getMessage());
         }
     }
@@ -141,21 +135,24 @@ public void insertar(Pedido pedido) throws Exception {
     
     public boolean activarPedido(long idPedido) throws Exception {
         validarId(idPedido);
-         try {
-            Connection conn = txManager.getConnection();
+        try (TransactionManager txManager = 
+         new TransactionManager(DatabaseConnection.getConnection())) {
+        
             txManager.startTransaction();
+            Connection conn = txManager.getConnection();
             
             pedidoDAO.restaurarEliminadoTx(idPedido,conn);  // Usa el DAO inyectado
             envioDAO.restaurarEliminadoTx(idPedido,conn);// Usa el DAO inyectado
 
             txManager.commit();
+            return true;
             
         } catch (Exception e) {
-            txManager.rollback();
             System.out.println("Error en el servicio al activar el pedido."+ e.getMessage());
+            return false;
         } 
 
-        return true;
+
     }
     
     
