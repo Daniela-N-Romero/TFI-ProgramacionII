@@ -8,6 +8,11 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * @author Esteban Rivarola, Daniela Romero, Agustín Rivarola
+ */
+
 public class DBInitializer {
 
     private static final String SQL_FILE_NAME = "init.sql";
