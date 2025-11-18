@@ -54,15 +54,15 @@ public class DBInitializer {
         }
         // VERIFICACIÓN: ¿Hay datos?
             if (isTableEmpty(connDB, "pedidos")) {
-                System.out.println("ℹ️ La base de datos está vacía. Cargando datos iniciales...");
+                System.out.println("La base de datos está vacía. Cargando datos iniciales...");
                 // Ejecutamos los inserts separados
                 String[] inserts = SEED_DATA_SQL.split(";");
                 for (String insert : inserts) {
                      if (!insert.trim().isEmpty()) stmt.execute(insert.trim());
                 }
-                System.out.println("✅ Datos iniciales cargados.");
+                System.out.println("Datos iniciales cargados.");
             } else {
-                System.out.println("ℹ️ La base de datos ya contiene datos. Se omite la carga inicial.");
+                System.out.println("La base de datos ya contiene datos. Se omite la carga inicial.");
             }
 
             System.out.println("Inicialización completa.");
