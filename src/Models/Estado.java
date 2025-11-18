@@ -10,4 +10,20 @@ package Models;
  */
 public enum Estado {
     NUEVO, FACTURADO, ENVIADO;
+    
+    public static Estado fromString(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return null;
+        }
+        // Aplicamos la sanitización para que CORREO ARG funcione como CORREO_ARG
+        String str = text.trim().toUpperCase().replace(" ", "_");
+        
+        // Usamos try-catch internamente, pero la capa de UI no lo ve
+        try {
+            return Estado.valueOf(str);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+    
 }

@@ -193,29 +193,37 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             long envioId = rs.getLong("e.id"); // e_id viene del SELECT_BASE
             // rs.wasNull() comprueba si el valor leído (e_id) era NULL en la BD
             if (!rs.wasNull()) { 
-                Envio envio = new Envio();
-            
-            
-            envio.setId(envioId);
-            envio.setTracking(rs.getString("e.tracking"));
-            envio.setCosto(rs.getBigDecimal("e.costo"));
-            
-            java.sql.Date sqlFechaDespacho = rs.getDate("e.fechaDespacho");
-            if (sqlFechaDespacho != null) {
-                envio.setFechaDespacho(sqlFechaDespacho.toLocalDate());
-            }
-            java.sql.Date sqlFechaEstimada = rs.getDate("e.fechaEstimada");
-            if (sqlFechaEstimada != null) {
-                envio.setFechaEstimada(sqlFechaEstimada.toLocalDate());
-            }
-            
-            // Mapeo de Enums de Envío (asumo que están en Models)
-            envio.setEmpresa(Empresa.valueOf(rs.getString("e.empresa")));
-            envio.setEstado(EstadoEnvio.valueOf(rs.getString("e.estado"))); 
-            envio.setTipo(TipoEnvio.valueOf(rs.getString("e.tipo")));
+                
+                boolean envioEstaEliminado = rs.getBoolean("e.eliminado");
+                if (!envioEstaEliminado) {
+                    Envio envio = new Envio();
+                    envio.setId(envioId);
+                    envio.setTracking(rs.getString("e.tracking"));
+                    envio.setCosto(rs.getBigDecimal("e.costo"));
+                    java.sql.Date sqlFechaDespacho = rs.getDate("e.fechaDespacho");
+                    if (sqlFechaDespacho != null) {
+                        envio.setFechaDespacho(sqlFechaDespacho.toLocalDate());
+                    }
+                    java.sql.Date sqlFechaEstimada = rs.getDate("e.fechaEstimada");
+                    if (sqlFechaEstimada != null) {
+                        envio.setFechaEstimada(sqlFechaEstimada.toLocalDate());
+                    }
 
-            pedido.setEnvio(envio);
-        }
+                    envio.setEmpresa(Empresa.valueOf(rs.getString("e.empresa")));
+                    envio.setEstado(EstadoEnvio.valueOf(rs.getString("e.estado"))); 
+                    envio.setTipo(TipoEnvio.valueOf(rs.getString("e.tipo")));
+
+                    pedido.setEnvio(envio);
+                }else {
+                // El envío existe en la DB pero está marcado como eliminado
+                    pedido.setEnvio(null); //null explicito
+                }
+                
+            } else {
+        // Si rs.wasNull() es TRUE, significa que el LEFT JOIN no encontró envío, 
+        // así que 'pedido.setEnvio' se deja como NULL por defecto o lo estableces explícitamente:
+        pedido.setEnvio(null);
+    }
     return pedido;
 }
 

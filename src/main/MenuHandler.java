@@ -90,7 +90,7 @@ public class MenuHandler {
         // El Service se encarga de la lógica transaccional (Pedido + Envío).
         pedidoService.insertar(pedido);
         
-        System.out.println("✅ Pedido creado exitosamente con ID: " + pedido.getId());
+        System.out.println("Pedido creado exitosamente con ID: " + pedido.getId());
         
     } catch (NumberFormatException e) {
         System.err.println("Error: El campo 'total' debe ser un número válido.");
@@ -322,6 +322,46 @@ public class MenuHandler {
             return tipo;
         }
         
+              // Bucle para EstadoEnvio
+        
+        public EstadoEnvio seleccionarEstadoEnvio(){
+            EstadoEnvio tipo = null;
+            do {
+                System.out.print("Estado de Envio (EN_PREPARACION, EN_TRANSITO, ENTREGADO;): ");
+                String tipoStr = scanner.nextLine();
+
+                // Usamos el helper estático del Enum: ¡Código limpio!
+                tipo = EstadoEnvio.fromString(tipoStr); 
+
+                if (tipo == null) {
+                    System.err.println("Error: Tipo de envío no válido. Intente con: ESTANDAR o EXPRESS.");
+                }
+            } while (tipo == null);
+
+            return tipo;
+        }
+        
+                      // Bucle para Estado
+        
+        public Estado seleccionarEstado(){
+            Estado tipo = null;
+            do {
+                System.out.print("Tipo de envio (ESTANDAR, EXPRESS): ");
+                String tipoStr = scanner.nextLine();
+
+                // Usamos el helper estático del Enum: ¡Código limpio!
+                tipo = Estado.fromString(tipoStr); 
+
+                if (tipo == null) {
+                    System.err.println("Error: Tipo de envío no válido. Intente con: ESTANDAR o EXPRESS.");
+                }
+            } while (tipo == null);
+
+            return tipo;
+        }
+        
+        
+        
         //Método para buscar Envios por ID
         public void buscarEnvioPorId() {
             try {
@@ -355,12 +395,8 @@ public class MenuHandler {
                     System.out.println("Envio con id " + id + " no encontrado.");
                     return;
                 }
-                //TRACKING.
-                System.out.println("Tracking (actual: " + envio.getTracking() + " Enter para mantener): ");
-                String tracking = scanner.nextLine().trim();
-                if(!tracking.isEmpty()) {
-                    envio.setTracking(tracking);
-                }
+                System.out.println("Actualizando envio con tracking: " + envio.getTracking());
+               
                 //COSTO.
                 System.out.println("Costo (actual: $" + String.format("%.2f", envio.getCosto()) + ", Enter para mantener): ");
                 String costoStr = scanner.nextLine().trim();
@@ -376,21 +412,51 @@ public class MenuHandler {
                 String empresaString = scanner.nextLine().trim();
                 if (!empresaString.isEmpty()) {
                     try {
-                        envio.setEmpresa(Empresa.valueOf(empresaString.toUpperCase()));
+                        Empresa empresa = Empresa.fromString(empresaString);
+                        while (empresa == null){
+                            System.out.println("Error: Empresa de envío no válida. Intente con: ANDREANI, OCA, o CORREO_ARG.");
+                            String str = scanner.nextLine().trim();
+                            empresa = Empresa.fromString(str);
+                        }                     
+                        envio.setEmpresa(empresa);
                     } catch (IllegalArgumentException e) {
                         System.err.println("Error: Empresa inválida. Se mantiene la anterior.");
                     }
                 }
                 //ESTADO DEL ENVIO
-                System.out.println("Estado (actual: " + envio.getEstado().name() + ", Enter para mantener. Opciones: EN_PREPARACION, DESPACHADO, EN_REPARTO, ENTREGADO): ");
+                System.out.println("Estado (actual: " + envio.getEstado().name() + ", Enter para mantener. Opciones:  EN_PREPARACION, EN_TRANSITO, ENTREGADO): ");
                 String estadoString = scanner.nextLine().trim();
                 if (!estadoString.isEmpty()) {
                     try {
-                        envio.setEstado(EstadoEnvio.valueOf(estadoString.toUpperCase()));
+                        EstadoEnvio estado = EstadoEnvio.fromString(estadoString);
+                        while (estado == null){
+                            System.out.println("Error: Estado de envío no válido. Intente con:  EN_PREPARACION, EN_TRANSITO o ENTREGADO.");
+                            String str = scanner.nextLine().trim();
+                            estado = EstadoEnvio.fromString(str);
+                        }  
+                        envio.setEstado(estado);
                     } catch (IllegalArgumentException e) {
                         System.err.println("Error: Estado de envío inválido. Se mantiene el anterior.");
                     }
                 }
+                
+                //TIPO DE ENVIO
+                System.out.println("Tipo (actual: " + envio.getTipo().name() + ", Enter para mantener. Opciones:  ESTANDAR, EXPRESS): ");
+                String tipoString = scanner.nextLine().trim();
+                if (!tipoString.isEmpty()) {
+                    try {
+                        TipoEnvio tipo = TipoEnvio.fromString(tipoString);
+                        while (tipo == null){
+                            System.out.println("Error: Tipo de envío no válido. Intente con: ESTANDAR o EXPRESS");
+                            String str = scanner.nextLine().trim();
+                            tipo = TipoEnvio.fromString(str);
+                        } 
+                        envio.setTipo(tipo);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error: Estado de envío inválido. Se mantiene el anterior.");
+                    }
+                }
+                
                 envioService.actualizar(envio);
                 System.out.println("Envío ID " + envio.getId() + " actualizado exitosamente.");
             } catch (NumberFormatException e) {
