@@ -1,6 +1,6 @@
 # GESTIÓN DE PEDIDOS Y ENVÍOS - Trabajo Final Integrador - Programación II
 
-## DESCRIPCIÓN DEL PROYECTO 📦
+## DESCRIPCIÓN DEL PROYECTO
 
 Este proyecto es un sistema de gestión de pedidos y envíos desarrollado en **Java (JDBC)** que implementa una arquitectura de **cinco capas** para garantizar la separación de responsabilidades, la encapsulación de la lógica de negocio y la gestión robusta de transacciones.
 
@@ -8,9 +8,7 @@ El sistema permite la administración completa del ciclo de vida de los pedidos 
 * Patrón **Soft Delete** para la eliminación lógica de entidades.
 * Sistema de **"Arranque Cero"** (`DBInitializer`) que crea la base de datos y carga datos iniciales automáticamente al ejecutarse por primera vez.
 
----
-
-## ARQUITECTURA Y TECNOLOGÍAS 💻
+## ARQUITECTURA Y TECNOLOGÍAS
 
 El proyecto sigue el principio de Separación de Responsabilidades con la siguiente estructura por capas:
 
@@ -27,8 +25,6 @@ El proyecto sigue el principio de Separación de Responsabilidades con la siguie
 * **Conexión:** JDBC Nativo.
 * **Arquitectura:** 5 Capas, Soft Delete.
 
----
-
 ## REQUISITOS E INSTALACIÓN 🛠️
 
 ### Requisitos Previos
@@ -39,7 +35,7 @@ El proyecto sigue el principio de Separación de Responsabilidades con la siguie
 ### Configuración del Driver JDBC (Importante)
 El proyecto incluye el driver JDBC de MariaDB necesario en la estructura del código:
 
-> ⚠️ **Inclusión del Driver:** El archivo `mariadb-java-client-X.X.X.jar` se encuentra en la carpeta **`/lib`** del proyecto. Esto asegura que no haya conflictos con rutas locales y que no necesites descargar el driver por separado. Verifica que tu IDE lo haya añadido correctamente a las librerías de compilación.
+> **Inclusión del Driver:** El archivo `mariadb-java-client-X.X.X.jar` se encuentra en la carpeta **`/lib`** del proyecto. Esto asegura que no haya conflictos con rutas locales y que no necesites descargar el driver por separado. Verifica que tu IDE lo haya añadido correctamente a las librerías de compilación.
 
 ### Inicialización de la Base de Datos
 
@@ -47,12 +43,14 @@ El sistema maneja la creación de la base de datos de forma automática.
 
 1.  Asegúrate de que el servidor MariaDB esté corriendo en `localhost:3306`.
 2.  Verifica las credenciales en `src/Config/DatabaseConnection.java`:
+3.  
     ```java
     private static final String USER = "root";
     private static final String PASSWORD = ""; // Ajustar si tu root tiene contraseña
     ```
-3.  La aplicación, al ejecutarse, creará la base de datos `tfi_db`, sus tablas y cargará los datos iniciales de ejemplo si es la primera vez.
-4.  Crear las Tablas: Utiliza la siguiente estructura para las tablas pedidos y envios:
+    
+4.  La aplicación, al ejecutarse, creará la base de datos `tfi_db`, sus tablas y cargará los datos iniciales de ejemplo si es la primera vez.
+5.  Crear las Tablas: Utiliza la siguiente estructura para las tablas pedidos y envios:
 
 SQL
 
@@ -80,9 +78,7 @@ CREATE TABLE envios (
     FOREIGN KEY (id_pedido) REFERENCES pedidos(id)
 );
 
----
-
-## EJECUCIÓN DEL PROYECTO ▶️
+## EJECUCIÓN DEL PROYECTO 
 
 1.  **Abrir:** Abre el proyecto en tu IDE (NetBeans/IntelliJ).
 2.  **Ejecutar:** Haz clic derecho en la clase principal (`main.Main`) o usa la opción "Run" del proyecto.
@@ -90,7 +86,7 @@ CREATE TABLE envios (
 
 ---
 
-## ROLES Y CONTRIBUCIONES 🧑‍💻
+## ROLES Y CONTRIBUCIONES
 
 * **Daniela (DevOps & Data Engineer):** Gestión de versiones (Git), infraestructura de conexión (`Config`), diseño de BBDD y depuración crítica.
 * **Esteban (Backend & DAL Architect):** Arquitectura UML, implementación de la capa DAO, consultas SQL complejas y desarrollo de la interfaz de menús.
